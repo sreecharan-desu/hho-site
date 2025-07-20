@@ -1,76 +1,82 @@
 import React from 'react';
 
-const StoriesOfImpact = () => {
-    const testimonials = [
-        // Column 1
-        [
-          {
-            name: "Deepika Reddy",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-            content: "HHO gave me a platform to contribute meaningfully to rural education drives. The volunteers are passionate, and the programs are well-structured."
-          },
-          {
-            name: "Mohan Krishna",
-            handle: "@mohan_k",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-            content: "Seamless coordination, impactful outcomes. Being a part of HHO helped me connect with people and purpose."
-          },
-          {
-            name: "Suma Rao",
-            handle: "@suma.rao93",
-            avatar: "S",
-            avatarBg: "bg-red-700",
-            content: "I’ve volunteered with a few NGOs before, but HHO stands out for how deeply they care about people. Their disaster relief efforts were organized and compassionate."
-          },
-          {
-            name: "Rahul D",
-            handle: "@rahuld_ongole",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-            content: "From ration drives to health camps, HHO works where it matters most. Proud to support their vision. Their local impact in Andhra Pradesh is unmatched."
-          }
-        ],
-        // Column 2
-        [
-          {
-            name: "Anjali M",
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-            content: "The women's health initiative by HHO was a turning point in my village. They didn't just donate, they educated and empowered."
-          },
-          {
-            name: "Faraz M",
-            handle: "@farazm",
-            avatar: "F",
-            avatarBg: "bg-blue-500",
-            content: "I hosted a blood donation drive with HHO. The transparency, the support, and the follow-ups were world-class. This is how all NGOs should operate."
-          },
-          {
-            name: "Chandrika S.",
-            role: "School Teacher, Ongole",
-            avatar: "C",
-            avatarBg: "bg-green-600",
-            content: "They brought notebooks, shoes, and most importantly, hope. Our students now look forward to learning again. Thank you, HHO."
-          }
-        ],
-        // Column 3
-        [
-          {
-            name: "Vikrant Reddy",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face",
-            content: "A friend introduced me to HHO during a cyclone relief campaign. I never imagined grassroots help could be this efficient."
-          },
-          {
-            name: "Lavanya Devi",
-            avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=40&h=40&fit=crop&crop=face",
-            content: "HHO made it so easy to get involved. I helped distribute sanitary kits across two districts, and everything was perfectly planned. It felt good to give back with a team that truly cares."
-          },
-          {
-            name: "Abhay Kumar",
-            handle: "@abhaykumar12",
-            avatar: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=40&h=40&fit=crop&crop=face",
-            content: "Joined one of their food distribution drives and was blown away by the dedication. HHO isn’t just another NGO — it’s a family."
-          }
-        ]
-      ];
+type Testimonial = {
+  name: string;
+  avatar: string;
+  content: string;
+  handle?: string;
+  role?: string;
+  avatarBg?: string;
+};
+
+const StoriesOfImpact: React.FC = () => {
+  const testimonials: Testimonial[][] = [
+    [
+      {
+        name: "Deepika Reddy",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
+        content: "HHO gave me a platform to contribute meaningfully to rural education drives. The volunteers are passionate, and the programs are well-structured."
+      },
+      {
+        name: "Mohan Krishna",
+        handle: "@mohan_k",
+        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
+        content: "Seamless coordination, impactful outcomes. Being a part of HHO helped me connect with people and purpose."
+      },
+      {
+        name: "Suma Rao",
+        handle: "@suma.rao93",
+        avatar: "S",
+        avatarBg: "bg-red-700",
+        content: "I’ve volunteered with a few NGOs before, but HHO stands out for how deeply they care about people. Their disaster relief efforts were organized and compassionate."
+      },
+      {
+        name: "Rahul D",
+        handle: "@rahuld_ongole",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
+        content: "From ration drives to health camps, HHO works where it matters most. Proud to support their vision. Their local impact in Andhra Pradesh is unmatched."
+      }
+    ],
+    [
+      {
+        name: "Anjali M",
+        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
+        content: "The women's health initiative by HHO was a turning point in my village. They didn't just donate, they educated and empowered."
+      },
+      {
+        name: "Faraz M",
+        handle: "@farazm",
+        avatar: "F",
+        avatarBg: "bg-blue-500",
+        content: "I hosted a blood donation drive with HHO. The transparency, the support, and the follow-ups were world-class. This is how all NGOs should operate."
+      },
+      {
+        name: "Chandrika S.",
+        role: "School Teacher, Ongole",
+        avatar: "C",
+        avatarBg: "bg-green-600",
+        content: "They brought notebooks, shoes, and most importantly, hope. Our students now look forward to learning again. Thank you, HHO."
+      }
+    ],
+    [
+      {
+        name: "Vikrant Reddy",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face",
+        content: "A friend introduced me to HHO during a cyclone relief campaign. I never imagined grassroots help could be this efficient."
+      },
+      {
+        name: "Lavanya Devi",
+        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=40&h=40&fit=crop&crop=face",
+        content: "HHO made it so easy to get involved. I helped distribute sanitary kits across two districts, and everything was perfectly planned. It felt good to give back with a team that truly cares."
+      },
+      {
+        name: "Abhay Kumar",
+        handle: "@abhaykumar12",
+        avatar: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=40&h=40&fit=crop&crop=face",
+        content: "Joined one of their food distribution drives and was blown away by the dedication. HHO isn’t just another NGO — it’s a family."
+      }
+    ]
+  ];
 
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -82,7 +88,7 @@ const StoriesOfImpact = () => {
             Get started →
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((column, columnIndex) => (
             <div key={columnIndex} className="space-y-6">
