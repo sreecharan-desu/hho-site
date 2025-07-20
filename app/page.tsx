@@ -65,7 +65,7 @@ export default function HomePage() {
     { label: 'Success Stories', value: '45+', icon: <CheckCircle className="w-6 h-6 text-red-600" /> },
   ];
 
-  const scrollToSection = (ref) => {
+  const scrollToSection = (ref:any) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
 

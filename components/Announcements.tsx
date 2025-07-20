@@ -64,8 +64,8 @@ export default function AnnouncementsPreview() {
     },
   };
 
-  const getPriorityColor = (priority) => {
-    const colors = {
+  const getPriorityColor = (priority:any) => {
+    const colors:any = {
       high: "border-l-red-500 bg-red-50",
       medium: "border-l-blue-500 bg-blue-50",
       low: "border-l-green-500 bg-green-50",
@@ -82,6 +82,7 @@ export default function AnnouncementsPreview() {
         animate={visibleSection ? "visible" : "hidden"}
       >
         {/* Section Header */}
+        {/*@ts-expect-error --- */}
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-red-600 font-medium mb-4 shadow-sm border border-red-100">
             <Bell className="w-4 h-4" />
@@ -98,6 +99,7 @@ export default function AnnouncementsPreview() {
           {announcements.map((announcement) => (
             <motion.div
               key={announcement.id}
+              // @ts-expect-error ----
               variants={itemVariants}
               className={`group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 ${getPriorityColor(
                 announcement.priority
@@ -133,6 +135,7 @@ export default function AnnouncementsPreview() {
         </div>
 
         {/* View All Button */}
+                {/*@ts-expect-error --- */}
         <motion.div variants={itemVariants} className="text-center mt-12">
           <motion.button
             className="bg-red-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl"

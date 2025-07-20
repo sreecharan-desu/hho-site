@@ -1,12 +1,19 @@
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
-import { Target, Users, Calendar, TrendingUp, IndianRupee, ArrowRight } from "lucide-react";
+import {
+  Target,
+  Users,
+  Calendar,
+  TrendingUp,
+  IndianRupee,
+  ArrowRight,
+} from "lucide-react";
 
 export default function CurrentFundraiser() {
-  const [visibleSection, setVisibleSection] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [animatedAmount, setAnimatedAmount] = useState(0);
-  const sectionRef = useRef(null);
+  const [visibleSection, setVisibleSection] = useState<boolean>(false);
+  const [hasAnimated, setHasAnimated] = useState<boolean>(false);
+  const [animatedAmount, setAnimatedAmount] = useState<number>(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   const targetAmount = 340000;
   const currentAmount = 204000;
@@ -53,8 +60,8 @@ export default function CurrentFundraiser() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, duration: 0.6 }
-    }
+      transition: { staggerChildren: 0.15, duration: 0.6 },
+    },
   };
 
   const itemVariants = {
@@ -62,41 +69,44 @@ export default function CurrentFundraiser() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
-  const progressVariants = {
+  const progressVariants:any = {
     hidden: { width: 0 },
     visible: {
       width: `${progressPercentage}%`,
-      transition: { duration: 1.5, ease: "easeOut" }
-    }
+      transition: { duration: 1.5, ease: "easeOut" },
+    },
   };
 
-  const formatAmount = (amount) =>
+  const formatAmount = (amount: number): string =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
 
   const stats = [
     { icon: <Users className="w-6 h-6" />, title: "Contributors", value: "150+", color: "emerald" },
     { icon: <Calendar className="w-6 h-6" />, title: "Days Left", value: "28", color: "blue" },
-    { icon: <TrendingUp className="w-6 h-6" />, title: "Progress", value: `${progressPercentage.toFixed(0)}%`, color: "purple" }
+    { icon: <TrendingUp className="w-6 h-6" />, title: "Progress", value: `${progressPercentage.toFixed(0)}%`, color: "purple" },
   ];
 
-  const getColorClasses = (color) => ({
-    emerald: { bg: "bg-emerald-100", text: "text-emerald-600", border: "border-emerald-200" },
-    blue: { bg: "bg-blue-100", text: "text-blue-600", border: "border-blue-200" },
-    purple: { bg: "bg-purple-100", text: "text-purple-600", border: "border-purple-200" }
-  })[color];
+  const getColorClasses = (color: string) => {
+    const map = {
+      emerald: { bg: "bg-emerald-100", text: "text-emerald-600", border: "border-emerald-200" },
+      blue: { bg: "bg-blue-100", text: "text-blue-600", border: "border-blue-200" },
+      purple: { bg: "bg-purple-100", text: "text-purple-600", border: "border-purple-200" },
+    };
+    return map[color as keyof typeof map];
+  };
 
   return (
     <section ref={sectionRef} id="fundraiser" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <motion.div className="max-w-7xl mx-auto" variants={containerVariants} initial="hidden" animate={visibleSection ? "visible" : "hidden"}>
-        {/* Header */}
+        {/* @ts-expect-error --- */}
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full text-red-600 font-medium mb-4 border border-red-100">
             <Target className="w-4 h-4" />
@@ -109,10 +119,9 @@ export default function CurrentFundraiser() {
             Support Aavirbhav 2025 to create unforgettable memories for RGUKT Ongole students.
           </p>
         </motion.div>
+        {/* @ts-expect-error --- */}
 
-        {/* Main Card */}
         <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-md p-6 border border-gray-100" whileHover={{ y: -4 }}>
-          {/* Progress */}
           <div className="mb-6">
             <div className="flex justify-between mb-2">
               <h3 className="text-xl font-semibold text-gray-900">Progress</h3>
@@ -128,14 +137,15 @@ export default function CurrentFundraiser() {
                 initial="hidden"
                 animate={visibleSection ? "visible" : "hidden"}
               />
+      
             </div>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             {stats.map((stat) => {
               const { bg, text, border } = getColorClasses(stat.color);
               return (
+                // @ts-expect-error ---
                 <motion.div key={stat.title} variants={itemVariants} className={`p-4 rounded-lg border ${border}`}>
                   <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center mb-2`}>
                     <div className={text}>{stat.icon}</div>
@@ -147,7 +157,6 @@ export default function CurrentFundraiser() {
             })}
           </div>
 
-          {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <motion.button
               className="bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-700 flex items-center gap-2"
@@ -167,8 +176,8 @@ export default function CurrentFundraiser() {
             </motion.button>
           </div>
         </motion.div>
+        {/* @ts-expect-error --- */}
 
-        {/* Impact Message */}
         <motion.div variants={itemVariants} className="mt-12 text-center">
           <div className="bg-red-600 text-white rounded-xl p-6">
             <h3 className="text-xl font-semibold mb-2">Every Contribution Counts!</h3>
