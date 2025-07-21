@@ -564,20 +564,7 @@ export default function HomePage() {
                 </div>
          
               </motion.div>
-                            {/* @ts-expect-error --- IGNORE --- */}
-              <motion.div className="space-y-4" variants={itemVariants}>
-            
-                <motion.button
-                  onClick={shareSupport}
-                  className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center justify-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Share your support"
-                >
-                  <Share2 className="w-5 h-5" />
-                  Share Your Support
-                </motion.button>
-              </motion.div>
+     
                             {/* @ts-expect-error --- IGNORE --- */}
 
               <motion.div className="text-center text-sm text-gray-600" variants={itemVariants}>
