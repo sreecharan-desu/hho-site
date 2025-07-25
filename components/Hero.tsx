@@ -1,10 +1,11 @@
+
 import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronDown, Heart, Shield, Users, Play, Pause } from "lucide-react";
-import Image from "next/image";
+import { apiData } from "@/lib/api";
 
 interface EnhancedHeroSectionProps {
-  openDonatePopup: () => void; // Add prop type for the callback
+  openDonatePopup: () => void;
 }
 
 export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSectionProps) {
@@ -20,23 +21,9 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
   const y = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? -10 : -60]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  const heroMessages = [
-    {
-      title: "Small Acts. Big Impact",
-      subtitle: "Together, we create hope and support during life's most challenging moments. Join our community dedicated to making a meaningful difference.",
-      cta: "Start Making a Difference"
-    },
-    {
-      title: "Every Drop Counts",
-      subtitle: "Your generosity creates ripples of change that reach far beyond what you can imagine. Be part of something bigger.",
-      cta: "Join the Movement"
-    },
-    {
-      title: "Building Tomorrow",
-      subtitle: "Through compassion and community action, we're creating lasting solutions for those who need it most.",
-      cta: "Build With Us"
-    }
-  ];
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "EnhancedHeroSection")?.data;
+  const heroMessages = componentData?.heroMessages || [];
 
   const startSlideshow = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -128,7 +115,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-white px-4 py-2 rounded-md shadow-lg"
       >
-        Skip to main content
+        {componentData?.accessibility.skipLink}
       </a>
 
       <div className="absolute inset-0" aria-hidden="true">
@@ -189,11 +176,11 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
             }}
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.08, filter: "brightness(1.1)" }}
             role="img"
-            aria-label="Charity organization logo"
+            aria-label={componentData?.accessibility.logoAlt}
           >
             <img
               src="/logo.png"
-              alt="Charity organization logo"
+              alt={componentData?.accessibility.logoAlt}
               className="w-32 h-32 object-contain drop-shadow-lg"
               {...pulseAnimation}
             />
@@ -210,10 +197,10 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
                 className="space-y-8"
               >
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-gray-900 leading-tight tracking-wide">
-                  {heroMessages[currentSlide].title.split(' ').map((word, index) => (
+                  {heroMessages[currentSlide]?.title.split(' ').map((word: string, index: number) => (
                     <motion.span
                       key={`${currentSlide}-${index}`}
-                      className={word.includes('Big') || word.includes('Drop') || word.includes('Tomorrow') ? 'text-red-600' : ''}
+                      className={heroMessages[currentSlide]?.highlightedWords.includes(word) ? 'text-red-600' : ''}
                       initial={{ opacity: shouldReduceMotion ? 1 : 0, y: shouldReduceMotion ? 0 : 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
@@ -227,7 +214,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
                   ))}
                 </h1>
                 <p className="text-xl sm:text-2xl text-gray-600 max-w-5xl mx-auto leading-relaxed">
-                  {heroMessages[currentSlide].subtitle}
+                  {heroMessages[currentSlide]?.subtitle}
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -240,14 +227,14 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
             transition={{ duration: 0.7, delay: shouldReduceMotion ? 0 : 0.8 }}
           >
             <motion.button
-              onClick={openDonatePopup} // Call the callback to open Donate popup
+              onClick={openDonatePopup}
               className="group relative inline-flex items-center px-10 py-5 text-lg font-bold rounded-xl bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/60 shadow-xl hover:shadow-2xl transition-all duration-300"
               whileHover={{ scale: shouldReduceMotion ? 1 : 1.05, y: shouldReduceMotion ? 0 : -4 }}
               whileTap={{ scale: shouldReduceMotion ? 1 : 0.96 }}
-              aria-label={`${heroMessages[currentSlide].cta} - Open donation popup`}
+              aria-label={`${heroMessages[currentSlide]?.cta} - Open donation popup`}
             >
               <Heart className="w-6 h-6 mr-3" />
-              {heroMessages[currentSlide].cta}
+              {heroMessages[currentSlide]?.cta}
             </motion.button>
           </motion.div>
 
@@ -257,11 +244,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: shouldReduceMotion ? 0 : 1.2 }}
           >
-            {[
-              { icon: Shield, text: "Registered Charity", color: "text-green-500" },
-              { icon: Users, text: "Community Driven", color: "text-blue-500" },
-              { icon: Heart, text: "Transparent Impact", color: "text-purple-500" }
-            ].map((item, index) => (
+            {componentData?.features.map((item: any, index: number) => (
               <motion.div
                 key={item.text}
                 className="flex items-center gap-4 group"
@@ -270,7 +253,9 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
                 transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : 1.3 + index * 0.1 }}
                 whileHover={{ scale: shouldReduceMotion ? 1 : 1.07 }}
               >
-                <item.icon className={`w-6 h-6 ${item.color}`} />
+                {item.icon === 'Shield' && <Shield className={`w-6 h-6 ${item.color}`} />}
+                {item.icon === 'Users' && <Users className={`w-6 h-6 ${item.color}`} />}
+                {item.icon === 'Heart' && <Heart className={`w-6 h-6 ${item.color}`} />}
                 <span className="text-base font-semibold group-hover:text-gray-700 transition-colors">
                   {item.text}
                 </span>
@@ -292,7 +277,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
               {isPlaying ? <Pause className="w-5 h-5 text-gray-600" /> : <Play className="w-5 h-5 text-gray-600" />}
             </button>
             <div className="flex gap-3" role="tablist" aria-label="Slide navigation">
-              {heroMessages.map((_, index) => (
+              {heroMessages.map((_: any, index: number) => (
                 <button
                   key={index}
                   className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500/60 ${
@@ -301,7 +286,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
                   onClick={() => goToSlide(index)}
                   role="tab"
                   aria-selected={index === currentSlide}
-                  aria-label={`Go to slide ${index + 1}: ${heroMessages[index].title}`}
+                  aria-label={`Go to slide ${index + 1}: ${heroMessages[index]?.title}`}
                 />
               ))}
             </div>
@@ -318,7 +303,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               className="flex flex-col items-center text-gray-400"
             >
-              <span className="text-base mb-3">Scroll to explore</span>
+              <span className="text-base mb-3">{componentData?.scrollPrompt}</span>
               <ChevronDown className="w-6 h-6" />
             </motion.div>
           </motion.div>

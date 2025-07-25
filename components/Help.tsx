@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
@@ -12,59 +13,10 @@ import {
   IndianRupee,
   LucideIcon,
 } from "lucide-react";
+import { apiData } from "@/lib/api";
 
-type ColorScheme = "emerald" | "blue" | "purple" | "orange";
 
-interface HelpOption {
-  icon: JSX.Element;
-  title: string;
-  subtitle: string;
-  desc: string;
-  color: ColorScheme;
-  impact: string;
-  cta: string;
-}
-
-const helpOptions: HelpOption[] = [
-  {
-    icon: <IndianRupee className="w-8 h-8" />,
-    title: "₹1 Weekly",
-    subtitle: "Micro Donation",
-    desc: "Contribute just ₹1 every week to create sustainable impact. Small amounts, when pooled together, fund emergency medical assistance.",
-    color: "emerald",
-    impact: "₹52/year per person",
-    cta: "Set Up Weekly Giving",
-  },
-  {
-    icon: <Gift className="w-8 h-8" />,
-    title: "₹100 Birthday",
-    subtitle: "Celebration Giving",
-    desc: "Transform your special day into an opportunity to help others. Contribute ₹100 on your birthday to support education initiatives.",
-    color: "blue",
-    impact: "Funds 2 students' resources",
-    cta: "Plan Birthday Gift",
-  },
-  {
-    icon: <HandHeart className="w-8 h-8" />,
-    title: "Volunteer",
-    subtitle: "Time & Skills",
-    desc: "Share your expertise and time to mentor students, organize events, or support our administrative operations.",
-    color: "purple",
-    impact: "4+ hours/month impact",
-    cta: "Join Our Team",
-  },
-  {
-    icon: <Gavel className="w-8 h-8" />,
-    title: "Kindness Auction",
-    subtitle: "Community Event",
-    desc: "Participate in our unique auction where acts of kindness, services, and handmade items are bid upon to raise funds.",
-    color: "orange",
-    impact: "Quarterly fundraiser",
-    cta: "View Auction Items",
-  },
-];
-
-const getColorClasses = (color: ColorScheme) => {
+const getColorClasses = (color: string) => {
   const classes = {
     emerald: {
       bg: "bg-emerald-50",
@@ -99,7 +51,7 @@ const getColorClasses = (color: ColorScheme) => {
       hoverBg: "hover:bg-orange-50/80",
     },
   };
-  return classes[color];
+  return classes[color as keyof typeof classes];
 };
 
 export default function ProfessionalHelpSection() {
@@ -107,6 +59,10 @@ export default function ProfessionalHelpSection() {
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
+
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "ProfessionalHelpSection")?.data;
+  const helpOptions = componentData?.helpOptions || [];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -193,27 +149,26 @@ export default function ProfessionalHelpSection() {
         {/* Header */}
         <div className="text-center mb-20">
           <motion.div
-          // @ts-expect-error ---
+            // @ts-expect-error ---
             variants={itemVariants}
             className="inline-flex items-center gap-2 bg-white/90 px-5 py-2.5 rounded-full text-red-600 font-medium mb-8 shadow-md border border-red-100"
             whileHover={{ scale: shouldReduceMotion ? 1 : 1.05, filter: "brightness(1.1)" }}
           >
             <Users className="w-5 h-5" />
-            Get Involved
+            {componentData?.sectionLabel}
           </motion.div>
 
           <motion.h2
-          // @ts-expect-error ---
-
+            // @ts-expect-error ---
             variants={itemVariants}
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-8 leading-tight"
           >
-            How You Can <span className="text-red-600">Help</span>
+            {componentData?.title.replace(componentData?.highlightedTitle, '')}
+            <span className="text-red-600">{componentData?.highlightedTitle}</span>
           </motion.h2>
 
           <motion.div
-          // @ts-expect-error ---
-
+            // @ts-expect-error ---
             variants={itemVariants}
             className="w-32 h-1 bg-gradient-to-r from-red-600 to-red-400 mx-auto mb-10"
             initial={{ width: 0 }}
@@ -222,25 +177,22 @@ export default function ProfessionalHelpSection() {
           />
 
           <motion.p
-          // @ts-expect-error ---
-
+            // @ts-expect-error ---
             variants={itemVariants}
             className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
           >
-            Choose the way that works best for you. Every contribution, no matter the size,
-            creates meaningful change in our community.
+            {componentData?.description}
           </motion.p>
         </div>
 
         {/* Cards */}
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-10">
-          {helpOptions.map((option) => {
+          {helpOptions.map((option: any) => {
             const color = getColorClasses(option.color);
             return (
               <motion.div
                 key={option.title}
-          // @ts-expect-error ---
-
+                // @ts-expect-error ---
                 variants={itemVariants}
                 whileHover={{ y: -10, boxShadow: "0 15px 35px rgba(0, 0, 0, 0.1)" }}
                 className={`relative bg-white rounded-2xl shadow-lg transition-all duration-500 overflow-hidden border border-gray-100 min-h-[400px] flex flex-col justify-between ${color.hoverBg}`}
@@ -253,7 +205,12 @@ export default function ProfessionalHelpSection() {
                     transition={{ duration: 0.5 }}
                     whileHover={{ scale: shouldReduceMotion ? 1 : 1.1, filter: "brightness(1.2)" }}
                   >
-                    <div className={color.icon}>{option.icon}</div>
+                    <div className={color.icon}>
+                      {option.icon === 'IndianRupee' && <IndianRupee className="w-8 h-8" />}
+                      {option.icon === 'Gift' && <Gift className="w-8 h-8" />}
+                      {option.icon === 'HandHeart' && <HandHeart className="w-8 h-8" />}
+                      {option.icon === 'Gavel' && <Gavel className="w-8 h-8" />}
+                    </div>
                   </motion.div>
 
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{option.title}</h3>
@@ -261,13 +218,12 @@ export default function ProfessionalHelpSection() {
                     {option.subtitle}
                   </p>
 
-                  <p className="text-gray-600 leading-relaxed mb-6 text-base flex-grow">{option.desc}</p>
+                  <p className="text-gray-600 leading-relaxed mb-6 text-base flex-grow">{option.description}</p>
 
                   <div
                     className={`inline-flex items-center gap-2 ${color.bg} ${color.border} border px-4 py-2 rounded-full mb-6`}
                   >
-           {/* @ts-expect-error --- */}
-
+                    {/*@ts-ignore */}
                     <motion.div
                       className={`w-2.5 h-2.5 ${color.icon.replace("text-", "bg-")} rounded-full`}
                       {...pulseAnimation}
@@ -298,7 +254,6 @@ export default function ProfessionalHelpSection() {
         {/* Footer CTA */}
         <motion.div
           // @ts-expect-error ---
-
           variants={itemVariants}
           className="mt-20 text-center"
           initial={{ opacity: 0, y: 50 }}
@@ -312,7 +267,7 @@ export default function ProfessionalHelpSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}
             >
-              Ready to Make a Difference?
+              {componentData?.ctaSection.title}
             </motion.h3>
             <motion.p
               className="text-lg sm:text-xl text-red-100 mb-8 max-w-3xl mx-auto"
@@ -320,25 +275,20 @@ export default function ProfessionalHelpSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.5 }}
             >
-              Join hundreds of supporters who are already creating positive change.
-              Start with any option above or contact us to explore custom ways to help.
+              {componentData?.ctaSection.description}
             </motion.p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <motion.button
-                className="bg-white text-red-600 font-semibold px-8 py-3 rounded-xl hover:bg-gray-50 transition-colors duration-300 shadow-md"
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-              >
-                Contact Us
-              </motion.button>
-              <motion.button
-                className="border-2 border-white text-white font-semibold px-8 py-3 rounded-xl hover:bg-white hover:text-red-600 transition-all duration-300"
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-              >
-                Learn More
-              </motion.button>
+              {componentData?.ctaSection.buttons.map((button: any, index: number) => (
+                <motion.button
+                  key={index}
+                  className={`font-semibold px-8 py-3 rounded-xl ${button.style} transition-colors duration-300`}
+                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
+                >
+                  {button.text}
+                </motion.button>
+              ))}
             </div>
           </div>
         </motion.div>

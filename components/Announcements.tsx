@@ -1,6 +1,8 @@
+
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { Bell, Clock, MapPin } from "lucide-react";
+import { apiData } from "@/lib/api";
 
 const api = "https://api.hho.org/announcements";
 
@@ -12,24 +14,8 @@ export default function AnnouncementsPreview() {
   const [error, setError] = useState(false);
   const sectionRef = useRef(null);
 
-  const mockAnnouncements: any[] = [
-    {
-      id: 1,
-      title: "Daily Aerobic Sessions",
-      message: "New aerobic sessions start at 6 AM daily. Join us for a healthy start to your day!",
-      time: "6:00 AM",
-      location: "Main Ground",
-      priority: "high",
-    },
-    {
-      id: 2,
-      title: "HHO Desks Installation",
-      message: "HHO desks coming soon to every academic block for better student support.",
-      time: "Coming Soon",
-      location: "All Academic Blocks",
-      priority: "medium",
-    },
-  ];
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "AnnouncementsPreview")?.data;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -49,7 +35,7 @@ export default function AnnouncementsPreview() {
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  // Commented out API fetch for now, using mock data instead
+  // Commented out API fetch for now, using data from api.ts instead
   /*
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -72,11 +58,11 @@ export default function AnnouncementsPreview() {
   }, []);
   */
 
-  // Initialize with mock data
+  // Initialize with data from api.ts
   useEffect(() => {
-    setAnnouncements(mockAnnouncements);
+    setAnnouncements(componentData?.announcements || []);
     setLoading(false);
-  }, []);
+  }, [componentData]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -120,19 +106,20 @@ export default function AnnouncementsPreview() {
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full text-red-600 font-medium mb-4 shadow-sm border border-red-100">
             <Bell className="w-4 h-4" />
-            Latest Updates
+            {componentData?.sectionLabel}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-             <span className="text-red-600">Announcements</span>
+            {componentData?.title.replace(componentData?.highlightedTitle, '')}
+            <span className="text-red-600">{componentData?.highlightedTitle}</span>
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-red-600 to-red-400 mx-auto"></div>
         </motion.div>
 
         {/* Announcements Grid */}
         {loading ? (
-          <p className="text-center text-gray-600">Loading announcements...</p>
+          <p className="text-center text-gray-600">{componentData?.loadingMessage}</p>
         ) : error ? (
-          <p className="text-center text-red-600">Failed to load, showing mock data.</p>
+          <p className="text-center text-red-600">{componentData?.errorMessage}</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
             {announcements.map((announcement: any) => (
@@ -173,8 +160,6 @@ export default function AnnouncementsPreview() {
             ))}
           </div>
         )}
-
-       
       </motion.div>
     </section>
   );
