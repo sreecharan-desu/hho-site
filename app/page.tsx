@@ -12,6 +12,8 @@ import AnnouncementsPreview from "@/components/Announcements";
 import CurrentFundraiser from "@/components/CurrentFundRaising";
 import HHOFooter from "@/components/Footer";
 import StoriesOfImpact from "@/components/StoriesOfImpact";
+import { apiData } from "@/lib/api";
+import DriveGallery from "@/components/ImagesGallery";
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,9 +25,9 @@ export default function HomePage() {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [donationAmount, setDonationAmount] = useState(1000);
   const [messageIndex, setMessageIndex] = useState(0);
-  const [donorName, setDonorName] = useState(""); // New state for donor name
-  const [donorEmail, setDonorEmail] = useState(""); // New state for donor email
-  const [isRecurring, setIsRecurring] = useState(false); // New state for recurring donation
+  const [donorName, setDonorName] = useState("");
+  const [donorEmail, setDonorEmail] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
   const aboutRef = useRef(null);
   const initiativesRef = useRef(null);
   const eventsRef = useRef(null);
@@ -33,88 +35,14 @@ export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
   const controls = useAnimationControls();
 
-  const config = [
-    {
-      type: "contact",
-      title: "Need Help?",
-      icon: HelpCircle,
-      details: [
-        {
-          icon: MapPin,
-          label: "Address",
-          content: ["Santhanutalapadu, 523225", "Andhra Pradesh, India"],
-        },
-        {
-          icon: Phone,
-          label: "Phone",
-          content: ["+91 79819 37656"],
-        },
-        {
-          icon: Mail,
-          label: "Email",
-          content: ["hho@rguktong.ac.in"],
-          link: "mailto:hho@rguktong.ac.in",
-        },
-      ],
-      supportOptions: [
-        {
-          icon: Edit,
-          label: "Submit a Ticket",
-          action: () => alert("Ticket form opened!"),
-        },
-        {
-          icon: MessageCircle,
-          label: "Live Chat",
-          action: () => alert("Live chat initiated!"),
-        },
-      ],
-    },
-    {
-      type: "donate",
-      title: "Support Our Cause",
-      icon: DollarSign,
-      details: [
-        {
-          icon: null,
-          label: "Motivational Messages",
-          content: [
-            "Your donation can change lives! Every contribution brings hope and support.",
-            "Together, we can make a difference—donate today!",
-            "Every small act of kindness creates a ripple of hope. Be the change!",
-          ],
-        },
-        {
-          icon: null,
-          label: "Bank Transfer",
-          content: [
-            "Account Name: Helping Hands Organization",
-            "Bank: State Bank of India",
-            "Account Number: 1234567890",
-            "IFSC Code: SBIN0001234",
-            "Branch: Santhanutalapadu",
-          ],
-        },
-        {
-          icon: null,
-          label: "UPI Payment",
-          content: ["UPI ID: 7981937656@okbizaxis"],
-          qr: "/upi-qr.png",
-        },
-        {
-          icon: null,
-          label: "Other Methods",
-          content: [
-            "PayPal: donate@hho.org",
-            "Google Pay: +91 79819 37656",
-          ],
-        },
-      ],
-      donationStats: {
-        totalDonations: 15000,
-        goal: 50000,
-      },
-    },
-  ];
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "HomePage")?.data;
+  const config = {
+    header: componentData?.header,
+    helpPopup: componentData?.helpPopup,
+    donatePopup: componentData?.donatePopup,
+    confirmationModal: componentData?.confirmationModal
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -124,10 +52,10 @@ export default function HomePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % config.find((c) => c.type === "donate").details.find((d) => d.label === "Motivational Messages").content.length);
+      setMessageIndex((prev) => (prev + 1) % (config.donatePopup?.motivationalMessages.length || 1));
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [config.donatePopup]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -150,11 +78,11 @@ export default function HomePage() {
   const openDonatePopup = () => {
     setIsDonatePopupOpen(true);
   };
+
   const shareSupport = () => {
-    const websiteUrl = window.location.href; // Get the current URL
+    const websiteUrl = window.location.href;
     const shareText = `I just donated ₹${donationAmount} to Helping Hands Organization! Join me in supporting their cause: ${websiteUrl}`;
     
-    // Optional: Check if a donation amount is set to avoid misleading share messages
     if (donationAmount < 100) {
       alert("Please enter a valid donation amount before sharing.");
       return;
@@ -172,12 +100,12 @@ export default function HomePage() {
         alert("Failed to share. Please copy this link: " + shareText);
       });
     } else {
-      // Fallback: Copy to clipboard instead of just showing an alert
       navigator.clipboard.writeText(shareText)
         .then(() => alert("Link copied to clipboard! Paste it to share."))
         .catch(() => alert("Failed to copy. Please manually copy: " + shareText));
     }
   };
+
   const validateDonation = () => {
     if (donationAmount < 100) {
       alert("Please enter an amount of at least ₹100.");
@@ -215,7 +143,7 @@ export default function HomePage() {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.6, ease: [0.32, 0, 0.1, 1] },
+      transition: { duration: 0.6, ease: "easeInOut" },
     },
   };
 
@@ -256,41 +184,32 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Header (unchanged) */}
+      {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="HHO Logo" className="w-10 h-10" />
-            <h1 className="text-2xl font-bold text-red-600">HHO</h1>
+            <img src="/logo.png" alt={config.header?.logoAlt} className="w-10 h-10" />
+            <h1 className="text-2xl font-bold text-red-600">{config.header?.brand}</h1>
           </div>
           <nav className="hidden md:flex items-center space-x-8">
-            {[
-              { name: "About", ref: aboutRef },
-              { name: "Initiatives", ref: initiativesRef },
-              { name: "Events", ref: eventsRef },
-              { name: "Impact", ref: impactRef },
-            ].map((item) => (
+            {config.header?.navItems.map((item: any) => (
               <button
                 key={item.name}
-                onClick={() => scrollToSection(item.ref)}
+                onClick={() => scrollToSection(eval(item.ref))}
                 className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors duration-200 cursor-pointer"
               >
                 {item.name}
               </button>
             ))}
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); setIsDonatePopupOpen(true); }}
-              className="px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-            >
-              Donate
-            </a>
-            <button
-              onClick={() => setIsHelpPopupOpen(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-            >
-              Need Help
-            </button>
+            {config.header?.buttons.map((button: any, index: number) => (
+              <button
+                key={index}
+                onClick={button.text === "Donate" ? () => setIsDonatePopupOpen(true) : () => setIsHelpPopupOpen(true)}
+                className={`px-${button.text === "Donate" ? 6 : 4} py-2 ${button.style} rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer`}
+              >
+                {button.text}
+              </button>
+            ))}
           </nav>
           <button className="md:hidden cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="w-6 h-6 text-red-600" /> : <Menu className="w-6 h-6 text-red-600" />}
@@ -299,16 +218,11 @@ export default function HomePage() {
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-md">
             <div className="px-4 py-4 space-y-3">
-              {[
-                { name: "About", ref: aboutRef },
-                { name: "Initiatives", ref: initiativesRef },
-                { name: "Events", ref: eventsRef },
-                { name: "Impact", ref: impactRef },
-              ].map((item) => (
+              {config.header?.navItems.map((item: any) => (
                 <button
                   key={item.name}
                   onClick={() => {
-                    scrollToSection(item.ref);
+                    scrollToSection(eval(item.ref));
                     setIsMenuOpen(false);
                   }}
                   className="block w-full text-left text-sm font-medium text-gray-700 hover:text-red-600 cursor-pointer"
@@ -316,25 +230,21 @@ export default function HomePage() {
                   {item.name}
                 </button>
               ))}
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); setIsDonatePopupOpen(true); }}
-                className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-              >
-                Donate
-              </a>
-              <button
-                onClick={() => setIsHelpPopupOpen(true)}
-                className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-              >
-                Need Help
-              </button>
+              {config.header?.buttons.map((button: any, index: number) => (
+                <button
+                  key={index}
+                  onClick={button.text === "Donate" ? () => setIsDonatePopupOpen(true) : () => setIsHelpPopupOpen(true)}
+                  className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                >
+                  {button.text}
+                </button>
+              ))}
             </div>
           </div>
         )}
       </header>
 
-      {/* Help Popup (unchanged) */}
+      {/* Help Popup */}
       {isHelpPopupOpen && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
@@ -393,8 +303,8 @@ export default function HomePage() {
               variants={bounceAnimation}
               id="help-popup-title"
             >
-              <HelpCircle className="w-7 h-7 text-red-600" />
-              Need Help?
+              <config.helpPopup.icon className="w-7 h-7 text-red-600" />
+              {config.helpPopup?.title}
             </motion.h2>
             <motion.div
               className="space-y-6"
@@ -402,25 +312,20 @@ export default function HomePage() {
               initial="hidden"
               animate="visible"
             >
-              {/* @ts-expect-error --- IGNORE --- */}
-              {config.find((c) => c.type === "contact").details.map((detail, index) => (
+              {config.helpPopup?.details.map((detail: any, index: number) => (
                 <motion.div
                   key={index}
                   className="flex items-start gap-3"
-              // @ts-expect-error --- IGNORE ---
-
+                  // @ts-expect-error --- IGNORE ---
                   variants={itemVariants}
                 >
                   {detail.icon && <detail.icon className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />}
                   <div>
                     <h5 className="font-semibold text-gray-900 text-sm mb-1">{detail.label}</h5>
-                    {detail.content.map((item, idx) => (
+                    {detail.content.map((item: string, idx: number) => (
                       <p key={idx} className="text-gray-600 text-sm">
-                                      {/* @ts-expect-error --- IGNORE --- */}
-
                         {detail.link && idx === detail.content.length - 1 ? (
                           <a
-                          // @ts-ignore
                             href={detail.link}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -445,7 +350,7 @@ export default function HomePage() {
                   </div>
                 </motion.div>
               ))}
-             
+      
             </motion.div>
           </motion.div>
         </motion.div>
@@ -502,7 +407,17 @@ export default function HomePage() {
             >
               <X className="w-6 h-6" />
             </button>
-  
+            <motion.h2
+              className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3"
+              initial="hidden"
+              animate={controls}
+              // @ts-expect-error --- IGNORE ---
+              variants={bounceAnimation}
+              id="donate-popup-title"
+            >
+              <config.donatePopup.icon className="w-7 h-7 text-red-600" />
+              {config.donatePopup?.title}
+            </motion.h2>
             <motion.div
               className="space-y-8"
               variants={containerVariants}
@@ -517,59 +432,50 @@ export default function HomePage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
               >
-                              {/* @ts-expect-error --- IGNORE --- */}
-
-                {config.find((c) => c.type === "donate").details.find((d) => d.label === "Motivational Messages").content[messageIndex]}
+                {config.donatePopup?.motivationalMessages[messageIndex]}
               </motion.p>
-                  {/* @ts-expect-error --- IGNORE --- */}
-
+              {/* @ts-ignore --- */}
               <motion.div className="bg-red-50 p-6 rounded-xl" variants={itemVariants}>
                 <h3 className="text-xl font-semibold text-red-600 mb-4">Payment Methods</h3>
                 <div className="grid grid-cols-1 gap-4">
-                                {/* @ts-expect-error --- IGNORE --- */}
-                  {config.find((c) => c.type === "donate").details
-                    .filter((d) => d.label !== "Motivational Messages")
-                    .map((detail, index) => (
-                      <motion.div
-                        key={index}
-                        className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-                                      // @ts-expect-error --- IGNORE --- 
-                        variants={itemVariants}
-                        whileHover={{ y: -2 }}
-                      >
-                        <h4 className="font-medium text-gray-900 mb-2">{detail.label}</h4>
-                        {detail.content.map((item, idx) => (
-                          <p key={idx} className="text-gray-600 text-sm flex items-center gap-2">
-                            {item}
-                            <button
-                              onClick={() => copyToClipboard(item)}
-                              className="text-gray-400 hover:text-red-600 transition-colors"
-                              aria-label={`Copy ${detail.label}`}
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                          </p>
-                        ))}
-                                      {/* @ts-expect-error --- IGNORE --- */}
-
-                        {detail.qr && (
-                          <div className="flex justify-center mt-3">
-              {/* @ts-expect-error --- IGNORE --- */}
-
-                            <img src={detail.qr} alt="UPI QR Code" className="w-40 h-40 rounded-lg shadow-sm" />
-                          </div>
-                        )}
-                      </motion.div>
-                    ))}
+                  {config.donatePopup?.paymentMethods.map((detail: any, index: number) => (
+                    <motion.div
+                      key={index}
+                      className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                      // @ts-expect-error --- IGNORE ---
+                      variants={itemVariants}
+                      whileHover={{ y: -2 }}
+                    >
+                      <h4 className="font-medium text-gray-900 mb-2">{detail.label}</h4>
+                      {detail.content.map((item: string, idx: number) => (
+                        <p key={idx} className="text-gray-600 text-sm flex items-center gap-2">
+                          {item}
+                          <button
+                            onClick={() => copyToClipboard(item)}
+                            className="text-gray-400 hover:text-red-600 transition-colors"
+                            aria-label={`Copy ${detail.label}`}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                        </p>
+                      ))}
+                      {detail.qr && (
+                        <div className="flex justify-center mt-3">
+                          <img src={detail.qr} alt="UPI QR Code" className="w-40 h-40 rounded-lg shadow-sm" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
                 </div>
-         
               </motion.div>
-     
-                            {/* @ts-expect-error --- IGNORE --- */}
-
+              {/* @ts-ignore --- */}
               <motion.div className="text-center text-sm text-gray-600" variants={itemVariants}>
                 <p>
-                  Your donation of ₹{donationAmount} {isRecurring ? "monthly" : ""} will help us {donationAmount >= 5000 ? "transform communities" : donationAmount >= 1000 ? "make a big impact" : "support our cause"}. Thank you, {donorName || "Friend"}!
+                  {config.donatePopup?.donationMessageTemplate
+                    .replace("{amount}", donationAmount.toString())
+                    .replace("{recurring}", isRecurring ? "monthly" : "")
+                    .replace("{impact}", donationAmount >= 5000 ? config.donatePopup?.impactMessages["5000+"] : donationAmount >= 1000 ? config.donatePopup?.impactMessages["1000-4999"] : config.donatePopup?.impactMessages.default)
+                    .replace("{donorName}", donorName || "Friend")}
                 </p>
               </motion.div>
             </motion.div>
@@ -577,7 +483,7 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Confirmation Modal (unchanged) */}
+      {/* Confirmation Modal */}
       {isConfirmationOpen && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
@@ -611,21 +517,21 @@ export default function HomePage() {
               initial="hidden"
               animate="visible"
             >
-              {/* @ts-expect-error --- IGNORE --- */}
               <motion.div variants={itemVariants}>
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
               </motion.div>
               <motion.h2
                 className="text-2xl font-bold text-gray-900 mb-4"
                 id="confirmation-title"
-                              
                 variants={itemVariants}
               >
-                Thank You for Your Donation!
+                {config.confirmationModal?.title}
               </motion.h2>
+                            {/* @ts-ignore --- */}
               <motion.p className="text-gray-600 mb-6" variants={itemVariants}>
-                Your contribution of ₹{donationAmount} will make a significant impact. We’ll send you a confirmation email soon.
+                {config.confirmationModal?.message.replace("{amount}", donationAmount.toString())}
               </motion.p>
+                            {/* @ts-ignore --- */}
               <motion.button
                 onClick={() => setIsConfirmationOpen(false)}
                 className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-all duration-200"
@@ -633,7 +539,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.95 }}
                 variants={itemVariants}
               >
-                Close
+                {config.confirmationModal?.button}
               </motion.button>
             </motion.div>
           </motion.div>
@@ -676,7 +582,17 @@ export default function HomePage() {
           <ProfessionalHelpSection />
         </motion.div>
       </section>
-
+<section ref={initiativesRef} className="relative z-10">
+  <motion.div
+    className="w-full px-0 py-16" // Changed from max-w-7xl and adjusted padding
+    variants={containerVariants}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.2 }}
+  >
+    <DriveGallery />
+  </motion.div>
+</section>
       <section ref={impactRef} className="relative z-10">
         <motion.div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"

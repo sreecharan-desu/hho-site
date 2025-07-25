@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Phone, MessageCircle, Clock, ArrowRight } from "lucide-react";
+import { apiData } from "@/lib/api";
 
 export default function UrgentHelpAlert() {
   const [visibleSection, setVisibleSection] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef(null);
+
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "UrgentHelpAlert")?.data;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,8 +66,7 @@ export default function UrgentHelpAlert() {
     <section ref={sectionRef} className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-red-50 to-orange-50">
       <motion.div 
         className="max-w-4xl mx-auto"
-              // @ts-expect-error ---
-
+        // @ts-expect-error ---
         variants={containerVariants}
         initial="hidden"
         animate={visibleSection ? "visible" : "hidden"}
@@ -72,13 +75,11 @@ export default function UrgentHelpAlert() {
           <div className="bg-gradient-to-r from-red-600 to-red-500 px-8 py-6">
             <motion.div
               // @ts-expect-error ---
-
               variants={itemVariants}
               className="flex items-center justify-center gap-3"
             >
               <motion.div
-              // @ts-expect-error ---
-
+                // @ts-expect-error ---
                 variants={pulseVariants}
                 animate={hasAnimated ? "pulse" : {}}
                 className="bg-white/20 p-2 rounded-full"
@@ -86,7 +87,7 @@ export default function UrgentHelpAlert() {
                 <AlertTriangle className="w-8 h-8 text-white" />
               </motion.div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
-                Urgent Help Alert
+                {componentData?.title}
               </h2>
             </motion.div>
           </div>
@@ -94,56 +95,41 @@ export default function UrgentHelpAlert() {
           <div className="px-8 py-12">
             <motion.div
               // @ts-expect-error ---
-
               variants={itemVariants}
               className="text-center mb-8"
             >
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                A student needs immediate support
+                {componentData?.subtitle}
               </h3>
               <p className="text-gray-600 text-lg leading-relaxed max-w-2xl mx-auto">
-                We have received an urgent request for assistance. If you can help or know someone who can, 
-                please reach out to us immediately.
+                {componentData?.description}
               </p>
             </motion.div>
 
             <motion.div
               // @ts-expect-error ---
-
               variants={itemVariants}
               className="grid sm:grid-cols-2 gap-6 mb-8"
             >
-              <motion.div
-                className="bg-red-50 border border-red-200 rounded-xl p-6 group hover:shadow-lg transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="bg-red-600 p-3 rounded-full">
-                    <Phone className="w-6 h-6 text-white" />
+              {componentData?.contactMethods.map((method: any, index: number) => (
+                <motion.div
+                  key={index}
+                  className={`bg-${method.color}-50 border border-${method.color}-200 rounded-xl p-6 group hover:shadow-lg transition-all duration-300`}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className={`bg-${method.color}-600 p-3 rounded-full`}>
+                      {method.icon === 'Phone' && <Phone className="w-6 h-6 text-white" />}
+                      {method.icon === 'MessageCircle' && <MessageCircle className="w-6 h-6 text-white" />}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{method.method}</h4>
+                      <p className="text-sm text-gray-600">{method.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Call Now</h4>
-                    <p className="text-sm text-gray-600">Available 24/7</p>
-                  </div>
-                </div>
-                <p className="text-red-600 font-bold text-lg">+91 79819 37656</p>
-              </motion.div>
-
-              <motion.div
-                className="bg-blue-50 border border-blue-200 rounded-xl p-6 group hover:shadow-lg transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="bg-blue-600 p-3 rounded-full">
-                    <MessageCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Send Message</h4>
-                    <p className="text-sm text-gray-600">Quick response</p>
-                  </div>
-                </div>
-                <p className="text-blue-600 font-semibold">hho@rguktong.ac.in</p>
-              </motion.div>
+                  <p className={`text-${method.color}-600 font-bold text-lg`}>{method.value}</p>
+                </motion.div>
+              ))}
             </motion.div>
 
             <motion.div
@@ -151,23 +137,18 @@ export default function UrgentHelpAlert() {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
-              <motion.button
-                className="bg-red-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Request Help Now
-                <ArrowRight className="w-4 h-4" />
-              </motion.button>
-              
-              <motion.button
-                className="border-2 border-red-600 text-red-600 font-semibold px-8 py-3 rounded-xl hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Clock className="w-4 h-4" />
-                Emergency Guidelines
-              </motion.button>
+              {componentData?.buttons.map((button: any, index: number) => (
+                <motion.button
+                  key={index}
+                  className={`${button.style} font-semibold px-8 py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {button.icon === 'ArrowRight' && <ArrowRight className="w-4 h-4" />}
+                  {button.icon === 'Clock' && <Clock className="w-4 h-4" />}
+                  {button.text}
+                </motion.button>
+              ))}
             </motion.div>
           </div>
 

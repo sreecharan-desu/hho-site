@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import {
@@ -8,6 +9,7 @@ import {
   IndianRupee,
   ArrowRight,
 } from "lucide-react";
+import { apiData } from "@/lib/api";
 
 export default function CurrentFundraiser() {
   const [visibleSection, setVisibleSection] = useState<boolean>(false);
@@ -15,8 +17,10 @@ export default function CurrentFundraiser() {
   const [animatedAmount, setAnimatedAmount] = useState<number>(0);
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  const targetAmount = 340000;
-  const currentAmount = 204000;
+  // Extract data for this component
+  const componentData:any = apiData.find(c => c.component === "CurrentFundraiser")?.data;
+  const targetAmount = componentData?.targetAmount || 0;
+  const currentAmount = componentData?.currentAmount || 0;
   const progressPercentage = (currentAmount / targetAmount) * 100;
 
   useEffect(() => {
@@ -73,7 +77,7 @@ export default function CurrentFundraiser() {
     },
   };
 
-  const progressVariants:any = {
+  const progressVariants: any = {
     hidden: { width: 0 },
     visible: {
       width: `${progressPercentage}%`,
@@ -88,11 +92,7 @@ export default function CurrentFundraiser() {
       maximumFractionDigits: 0,
     }).format(amount);
 
-  const stats = [
-    { icon: <Users className="w-6 h-6" />, title: "Contributors", value: "150+", color: "emerald" },
-    { icon: <Calendar className="w-6 h-6" />, title: "Days Left", value: "28", color: "blue" },
-    { icon: <TrendingUp className="w-6 h-6" />, title: "Progress", value: `${progressPercentage.toFixed(0)}%`, color: "purple" },
-  ];
+  const stats = componentData?.stats || [];
 
   const getColorClasses = (color: string) => {
     const map = {
@@ -110,13 +110,14 @@ export default function CurrentFundraiser() {
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full text-red-600 font-medium mb-4 border border-red-100">
             <Target className="w-4 h-4" />
-            Active Campaign
+            {componentData?.sectionLabel}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            Fundraiser: <span className="text-red-600">Aavirbhav 2025</span>
+            {componentData?.title.replace(componentData?.highlightedTitle, '')}
+            <span className="text-red-600">{componentData?.highlightedTitle}</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
-            Support Aavirbhav 2025 to create unforgettable memories for RGUKT Ongole students.
+            {componentData?.description}
           </p>
         </motion.div>
         {/* @ts-expect-error --- */}
@@ -137,18 +138,21 @@ export default function CurrentFundraiser() {
                 initial="hidden"
                 animate={visibleSection ? "visible" : "hidden"}
               />
-      
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            {stats.map((stat) => {
+            {stats.map((stat: any) => {
               const { bg, text, border } = getColorClasses(stat.color);
               return (
                 // @ts-expect-error ---
                 <motion.div key={stat.title} variants={itemVariants} className={`p-4 rounded-lg border ${border}`}>
                   <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center mb-2`}>
-                    <div className={text}>{stat.icon}</div>
+                    <div className={text}>
+                      {stat.icon === 'Users' && <Users className="w-6 h-6" />}
+                      {stat.icon === 'Calendar' && <Calendar className="w-6 h-6" />}
+                      {stat.icon === 'TrendingUp' && <TrendingUp className="w-6 h-6" />}
+                    </div>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900">{stat.value}</h3>
                   <p className={`text-sm ${text}`}>{stat.title}</p>
@@ -158,47 +162,37 @@ export default function CurrentFundraiser() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <motion.button
-              className="bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-700 flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <IndianRupee className="w-4 h-4" />
-              Donate
-            </motion.button>
-            <motion.button
-              className="border border-red-600 text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-600 hover:text-white flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              All Fundraisers
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
+            {componentData?.buttons.map((button: any, index: number) => (
+              <motion.button
+                key={index}
+                className={button.text === 'Donate' ? "bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-700 flex items-center gap-2" : "border border-red-600 text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-600 hover:text-white flex items-center gap-2"}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {button.icon === 'IndianRupee' && <IndianRupee className="w-4 h-4" />}
+                {button.icon === 'ArrowRight' && <ArrowRight className="w-4 h-4" />}
+                {button.text}
+              </motion.button>
+            ))}
           </div>
         </motion.div>
         {/* @ts-expect-error --- */}
 
         <motion.div variants={itemVariants} className="mt-12 text-center">
           <div className="bg-red-600 text-white rounded-xl p-6">
-            <h3 className="text-xl font-semibold mb-2">Every Contribution Counts!</h3>
-            <p className="text-sm max-w-xl mx-auto">
-              Your support ensures Aavirbhav 2025 creates lasting memories for our RGUKT Ongole community.
-            </p>
+            <h3 className="text-xl font-semibold mb-2">{componentData?.ctaSection.title}</h3>
+            <p className="text-sm max-w-xl mx-auto">{componentData?.ctaSection.description}</p>
             <div className="flex gap-3 justify-center mt-4">
-              <motion.button
-                className="bg-white text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-100"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Contact
-              </motion.button>
-              <motion.button
-                className="border border-white text-white font-medium px-4 py-2 rounded-lg hover:bg-white hover:text-red-600"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Learn More
-              </motion.button>
+              {componentData?.ctaSection.buttons.map((button: any, index: number) => (
+                <motion.button
+                  key={index}
+                  className={`font-medium px-4 py-2 rounded-lg ${button.style} hover:bg-gray-100 transition-colors duration-300`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {button.text}
+                </motion.button>
+              ))}
             </div>
           </div>
         </motion.div>
