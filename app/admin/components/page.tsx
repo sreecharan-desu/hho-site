@@ -1,7 +1,9 @@
+"use client";
+
 import { motion } from 'framer-motion';
 import { LogOut, Image, Settings, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const sidebarVariants = {
   hidden: { x: '-100%' },

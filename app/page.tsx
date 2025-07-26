@@ -15,6 +15,33 @@ import StoriesOfImpact from "@/components/StoriesOfImpact";
 import { apiData } from "@/lib/api";
 import DriveGallery from "@/components/ImagesGallery";
 
+// Icon mapping function
+const getIconComponent = (iconName: string) => {
+  const iconMap: { [key: string]: any } = {
+    Heart,
+    Users,
+    ArrowRight,
+    Menu,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    Globe,
+    Shield,
+    Lightbulb,
+    CheckCircle,
+    HelpCircle,
+    DollarSign,
+    MessageCircle,
+    Edit,
+    Phone,
+    Mail,
+    MapPin,
+    Copy,
+    Share2
+  };
+  return iconMap[iconName] || HelpCircle;
+};
+
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -43,6 +70,10 @@ export default function HomePage() {
     donatePopup: componentData?.donatePopup,
     confirmationModal: componentData?.confirmationModal
   };
+
+  // Get icon components
+  const HelpIcon = getIconComponent(config.helpPopup?.icon || "HelpCircle");
+  const DonateIcon = getIconComponent(config.donatePopup?.icon || "DollarSign");
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -303,7 +334,7 @@ export default function HomePage() {
               variants={bounceAnimation}
               id="help-popup-title"
             >
-              <config.helpPopup.icon className="w-7 h-7 text-red-600" />
+              <HelpIcon className="w-7 h-7 text-red-600" />
               {config.helpPopup?.title}
             </motion.h2>
             <motion.div
@@ -312,14 +343,15 @@ export default function HomePage() {
               initial="hidden"
               animate="visible"
             >
-              {config.helpPopup?.details.map((detail: any, index: number) => (
+              {config.helpPopup?.details.map((detail: any, index: number) => {
+                const DetailIcon = getIconComponent(detail.icon || "HelpCircle");
+                return (
                 <motion.div
                   key={index}
                   className="flex items-start gap-3"
-                  // @ts-expect-error --- IGNORE ---
                   variants={itemVariants}
                 >
-                  {detail.icon && <detail.icon className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />}
+                  {detail.icon && <DetailIcon className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />}
                   <div>
                     <h5 className="font-semibold text-gray-900 text-sm mb-1">{detail.label}</h5>
                     {detail.content.map((item: string, idx: number) => (
@@ -349,7 +381,8 @@ export default function HomePage() {
                     ))}
                   </div>
                 </motion.div>
-              ))}
+              );
+              })}
       
             </motion.div>
           </motion.div>
@@ -415,7 +448,7 @@ export default function HomePage() {
               variants={bounceAnimation}
               id="donate-popup-title"
             >
-              <config.donatePopup.icon className="w-7 h-7 text-red-600" />
+              <DonateIcon className="w-7 h-7 text-red-600" />
               {config.donatePopup?.title}
             </motion.h2>
             <motion.div

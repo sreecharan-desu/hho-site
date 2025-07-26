@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -8,24 +8,32 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
+export async function POST(request: Request) {
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
     
-    const { image } = req.body;
-    const result = await cloudinary.uploader.upload(image);
+    const formData = await request.formData();
+    const image = formData.get('image') as File;
+    
+    if (!image) {
+      return NextResponse.json({ message: 'No image provided' }, { status: 400 });
+    }
+
+    // Convert file to base64 for Cloudinary
+    const bytes = await image.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64Image = `data:${image.type};base64,${buffer.toString('base64')}`;
+    
+    const result = await cloudinary.uploader.upload(base64Image);
     
     // Store URL in MongoDB (assuming an Image model)
     const Image = mongoose.model('Image', new mongoose.Schema({ url: String }));
     const newImage = new Image({ url: result.secure_url });
     await newImage.save();
 
-    res.status(200).json({ url: result.secure_url });
+    return NextResponse.json({ url: result.secure_url });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Upload error:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
