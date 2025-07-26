@@ -55,6 +55,8 @@ export default function HomePage() {
   const [donorName, setDonorName] = useState("");
   const [donorEmail, setDonorEmail] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
+  const [siteData, setSiteData] = useState(apiData); // Fallback to static data
+  const [isLoading, setIsLoading] = useState(true);
   const aboutRef = useRef(null);
   const initiativesRef = useRef(null);
   const eventsRef = useRef(null);
@@ -62,8 +64,39 @@ export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
   const controls = useAnimationControls();
 
+  // Fetch data from API on component mount
+  useEffect(() => {
+    const fetchSiteData = async () => {
+      try {
+        const response = await fetch('/api/content');
+        if (response.ok) {
+          const data = await response.json();
+          // Transform the data to match the expected format
+          const transformedData = [
+            { component: "EnhancedHeroSection", data: data.hero || {} },
+            { component: "ProfessionalSections", data: data.about || {} },
+            { component: "AnnouncementsPreview", data: data.announcements || {} },
+            { component: "ProfessionalHelpSection", data: data.help || {} },
+            { component: "CurrentFundraiser", data: data.campaigns || {} },
+            { component: "StoriesOfImpact", data: data.impact || {} },
+            { component: "DriveGallery", data: data.gallery || {} },
+            { component: "HomePage", data: data.homepage || {} }
+          ];
+          setSiteData(transformedData);
+        }
+      } catch (error) {
+        console.error('Error fetching site data:', error);
+        // Keep using static data as fallback
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSiteData();
+  }, []);
+
   // Extract data for this component
-  const componentData:any = apiData.find(c => c.component === "HomePage")?.data;
+  const componentData:any = siteData.find(c => c.component === "HomePage")?.data;
   const config = {
     header: componentData?.header,
     helpPopup: componentData?.helpPopup,
@@ -83,7 +116,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % (config.donatePopup?.motivationalMessages.length || 1));
+      setMessageIndex((prev) => (prev + 1) % (config.donatePopup?.motivationalMessages?.length || 1));
     }, 5000);
     return () => clearInterval(interval);
   }, [config.donatePopup]);
@@ -188,6 +221,17 @@ export default function HomePage() {
   const bounceAnimation = {
     animate: { y: [0, -10, 0], transition: { duration: 0.5, repeat: Infinity, ease: "easeInOut" } },
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-red-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans relative overflow-hidden">

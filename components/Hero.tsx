@@ -21,7 +21,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
   const y = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? -10 : -60]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // Extract data for this component
+  // Extract data for this component - now passed as prop
   const componentData:any = apiData.find(c => c.component === "EnhancedHeroSection")?.data;
   const heroMessages = componentData?.heroMessages || [];
 

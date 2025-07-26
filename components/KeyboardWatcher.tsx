@@ -8,11 +8,14 @@ export default function KeyboardWatcher() {
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      const char = e.key.toLowerCase();
-      if (/^[a-z0-9]$/.test(char)) {
-        setTyped(prev => (prev + char).slice(-10)); // track last 10 chars
+      if (typeof e.key === 'string') {
+        const char = e.key.toLowerCase();
+        if (/^[a-z0-9]$/.test(char)) {
+          setTyped(prev => (prev + char).slice(-10)); // track last 10 chars
+        }
       }
     };
+
     document.addEventListener('keydown', handleKeydown);
     return () => document.removeEventListener('keydown', handleKeydown);
   }, []);
