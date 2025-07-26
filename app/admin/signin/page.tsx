@@ -18,8 +18,9 @@ export default function SignIn() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     }).then((res) => res.json());
-
+    
     if (result.success) {
+      localStorage.setItem("token", result.token);
       router.push("/admin/dashboard");
     } else {
       setError(result.message);
