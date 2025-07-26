@@ -18,6 +18,7 @@ import {
   Twitter,
   Instagram
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function HHOFooter() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -97,26 +98,24 @@ export default function HHOFooter() {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300 overflow-hidden">
-      {/* Pattern Background */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: "60px 60px"
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300 overflow-hidden font-sans">
+      <motion.div
+        className="absolute inset-0 bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.05)_2px,transparent_0)] bg-[length:50px_50px]"
+        animate={{ backgroundPosition: ["0 0", "50px 50px"] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        aria-hidden="true"
+      />
+      <div className="relative z-10 py-24 px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* About */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-xl flex items-center justify-center">
+              <motion.div
+                className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-xl flex items-center justify-center"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
                 <Heart className="w-6 h-6 text-white" />
-              </div>
+              </motion.div>
               <div>
                 <h3 className="text-xl font-bold text-white">HHO</h3>
                 <p className="text-sm text-red-400">Helping Hands Organization</p>
@@ -125,21 +124,23 @@ export default function HHOFooter() {
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering students and building communities at RGUKT Ongole. We believe in the power of collective support and sustainable change through education, emergency aid, and skill development.
             </p>
-
             <div className="grid grid-cols-2 gap-4">
               {achievements.map((ach, i) => (
-                <div
+                <motion.div
                   key={i}
-                  className="flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                  className="flex items-center gap-2 p-3 bg-gray-800/90 backdrop-blur-md rounded-lg border border-gray-700/50"
+                  whileHover={{ y: -3, boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)" }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <div className="text-red-400">{ach.icon}</div>
+                  <motion.div animate={{ y: [-2, 2, -2] }} transition={{ duration: 2, repeat: Infinity }}>
+                    <div className="text-red-400">{ach.icon}</div>
+                  </motion.div>
                   <span className="text-sm font-medium">{ach.text}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
               <Globe className="w-5 h-5 text-red-400" />
@@ -150,7 +151,7 @@ export default function HHOFooter() {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-red-400 flex items-center gap-2 group transition-all"
+                    className="text-gray-400 hover:text-red-400 flex items-center gap-2 group transition-all relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-[2px] before:bg-red-400 before:group-hover:w-full before:transition-all before:duration-300"
                   >
                     <ArrowUp className="w-3 h-3 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.name}
@@ -160,7 +161,6 @@ export default function HHOFooter() {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
               <Phone className="w-5 h-5 text-red-400" />
@@ -169,7 +169,9 @@ export default function HHOFooter() {
             <div className="space-y-6">
               {contactInfo.map((info, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className="mt-1">{info.icon}</div>
+                  <motion.div animate={{ y: [-2, 2, -2] }} transition={{ duration: 2, repeat: Infinity }}>
+                    <div className="mt-1">{info.icon}</div>
+                  </motion.div>
                   <div>
                     <h5 className="font-semibold text-white text-sm mb-1">{info.title}</h5>
                     {info.details.map((detail, idx) => (
@@ -182,24 +184,24 @@ export default function HHOFooter() {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="border-t border-gray-700 mb-12" />
 
-        {/* Social & Subscribe */}
         <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-6">
             <h4 className="text-white font-semibold">Follow Us:</h4>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
-                <a
+                <motion.a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`p-3 bg-gray-800 rounded-full text-gray-400 ${social.color} transition-all border border-gray-700 hover:border-gray-600`}
+                  className={`p-3 bg-gray-800/90 backdrop-blur-sm rounded-full text-gray-400 ${social.color} border border-gray-700/50`}
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
                   {social.icon}
-                </a>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -208,58 +210,61 @@ export default function HHOFooter() {
             <input
               type="email"
               placeholder="Subscribe to updates..."
-              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="px-4 py-2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500/60"
             />
-            <button className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors whitespace-nowrap">
+            <motion.button
+              className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg relative before:content-[''] before:absolute before:inset-0 before:bg-red-400/30 before:opacity-0 before:hover:opacity-100 before:transition-opacity before:duration-300"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               Subscribe
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        {/* Footer Credit */}
         <div className="text-center mt-12 pt-8 border-t border-gray-700 text-sm text-gray-500 select-none">
           © 2025 Helping Hands Organization - RGUKT Ongole. All rights reserved.
           <span className="mx-2">|</span>
           <span className="inline-flex items-center gap-1">
             Made with
-            <span className="relative w-4 h-4 inline-block">
+            <motion.span
+              className="relative w-4 h-4 inline-block"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
               <svg
-                className="absolute inset-0 animate-pulse"
+                className="absolute inset-0"
                 viewBox="0 0 24 24"
                 fill="#ef4444"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                  2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
-                  4.5 2.09C13.09 3.81 14.76 3 
-                  16.5 3 19.58 3 22 5.42 22 8.5c0 
-                  3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
-            </span>
+            </motion.span>
             <span>by</span>
             <a
-  href="https://sreecharandesu.in"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="font-semibold text-gray-300 not-italic tracking-wide hover:underline transition"
->
-  SreeCharan Desu
-</a>
-
+              href="https://sreecharandesu.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-gray-300 hover:text-red-400 transition"
+            >
+              SreeCharan Desu
+            </a>
             <span className="sr-only">for HHO</span>
           </span>
         </div>
       </div>
 
-      {/* Scroll to Top */}
-      <button
-        className={`fixed bottom-8 right-8 p-3 bg-red-600 text-white rounded-full shadow-2xl hover:bg-red-700 transition-all z-50 ${
+      <motion.button
+        className={`fixed bottom-8 right-8 p-3 bg-red-600 text-white rounded-full shadow-2xl relative before:content-[''] before:absolute before:inset-0 before:bg-red-400/30 before:rounded-full before:opacity-0 before:hover:opacity-100 before:transition-opacity before:duration-300 ${
           showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         onClick={scrollToTop}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
       >
         <ArrowUp className="w-6 h-6" />
-      </button>
+      </motion.button>
     </footer>
   );
 }
