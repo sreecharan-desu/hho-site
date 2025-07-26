@@ -1,3 +1,7 @@
+// @ts-nocheck
+
+"use client";
+
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Phone, MessageCircle, Clock, ArrowRight } from "lucide-react";
@@ -9,7 +13,7 @@ export default function UrgentHelpAlert() {
   const sectionRef = useRef(null);
 
   // Extract data for this component
-  const componentData:any = apiData.find(c => c.component === "UrgentHelpAlert")?.data;
+  const componentData: any = apiData.find((c) => c.component === "UrgentHelpAlert")?.data;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -37,9 +41,9 @@ export default function UrgentHelpAlert() {
       transition: {
         duration: 0.6,
         ease: "easeOut",
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -47,8 +51,8 @@ export default function UrgentHelpAlert() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const pulseVariants = {
@@ -57,16 +61,15 @@ export default function UrgentHelpAlert() {
       transition: {
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
     <section ref={sectionRef} className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-red-50 to-orange-50">
-      <motion.div 
+      <motion.div
         className="max-w-4xl mx-auto"
-        // @ts-expect-error ---
         variants={containerVariants}
         initial="hidden"
         animate={visibleSection ? "visible" : "hidden"}
@@ -74,12 +77,10 @@ export default function UrgentHelpAlert() {
         <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-red-100">
           <div className="bg-gradient-to-r from-red-600 to-red-500 px-8 py-6">
             <motion.div
-              // @ts-expect-error ---
               variants={itemVariants}
               className="flex items-center justify-center gap-3"
             >
               <motion.div
-                // @ts-expect-error ---
                 variants={pulseVariants}
                 animate={hasAnimated ? "pulse" : {}}
                 className="bg-white/20 p-2 rounded-full"
@@ -94,7 +95,6 @@ export default function UrgentHelpAlert() {
 
           <div className="px-8 py-12">
             <motion.div
-              // @ts-expect-error ---
               variants={itemVariants}
               className="text-center mb-8"
             >
@@ -107,7 +107,6 @@ export default function UrgentHelpAlert() {
             </motion.div>
 
             <motion.div
-              // @ts-expect-error ---
               variants={itemVariants}
               className="grid sm:grid-cols-2 gap-6 mb-8"
             >
@@ -133,13 +132,13 @@ export default function UrgentHelpAlert() {
             </motion.div>
 
             <motion.div
-              // @ts-expect-error ---
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               {componentData?.buttons.map((button: any, index: number) => (
-                <motion.button
+                <motion.a
                   key={index}
+                  href={`mailto:hho@rguktong.ac.in?subject=Urgent%20Request%20for%20${encodeURIComponent(button.text || 'Urgent Help')}&body=${encodeURIComponent(`I need urgent assistance regarding ${button.text || 'Urgent Help'}. ${componentData?.description || 'Please provide urgent assistance.'}`)}`}
                   className={`${button.style} font-semibold px-8 py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -147,7 +146,7 @@ export default function UrgentHelpAlert() {
                   {button.icon === 'ArrowRight' && <ArrowRight className="w-4 h-4" />}
                   {button.icon === 'Clock' && <Clock className="w-4 h-4" />}
                   {button.text}
-                </motion.button>
+                </motion.a>
               ))}
             </motion.div>
           </div>

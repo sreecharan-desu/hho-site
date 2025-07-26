@@ -269,13 +269,7 @@ export default function EnhancedHeroSection({ openDonatePopup }: EnhancedHeroSec
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: shouldReduceMotion ? 0 : 1.6 }}
           >
-            <button
-              onClick={togglePlayPause}
-              className="p-3 rounded-full bg-white/90 hover:bg-white shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-red-500/60"
-              aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
-            >
-              {isPlaying ? <Pause className="w-5 h-5 text-gray-600" /> : <Play className="w-5 h-5 text-gray-600" />}
-            </button>
+
             <div className="flex gap-3" role="tablist" aria-label="Slide navigation">
               {heroMessages.map((_: any, index: number) => (
                 <button

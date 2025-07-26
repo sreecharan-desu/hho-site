@@ -1,9 +1,29 @@
 // @ts-nocheck
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Heart, Users, ArrowRight, Menu, X, ChevronLeft, ChevronRight, Globe, Shield, Lightbulb, CheckCircle, HelpCircle, DollarSign, MessageCircle, Edit, Phone, Mail, MapPin, Copy, Share2 } from "lucide-react";
+import {
+  Heart,
+  Users,
+  ArrowRight,
+  Menu,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  Shield,
+  Lightbulb,
+  CheckCircle,
+  HelpCircle,
+  DollarSign,
+  MessageCircle,
+  Edit,
+  Phone,
+  Mail,
+  MapPin,
+  Copy,
+  Share2,
+} from "lucide-react";
 import { motion, useReducedMotion, useAnimationControls } from "framer-motion";
 import EnhancedHeroSection from "@/components/Hero";
 import ProfessionalSections from "@/components/About";
@@ -37,7 +57,7 @@ const getIconComponent = (iconName: string) => {
     Mail,
     MapPin,
     Copy,
-    Share2
+    Share2,
   };
   return iconMap[iconName] || HelpCircle;
 };
@@ -56,7 +76,7 @@ export default function HomePage() {
   const [donorEmail, setDonorEmail] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
   const [siteData, setSiteData] = useState(apiData); // Fallback to static data
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const aboutRef = useRef(null);
   const initiativesRef = useRef(null);
   const eventsRef = useRef(null);
@@ -64,44 +84,59 @@ export default function HomePage() {
   const shouldReduceMotion = useReducedMotion();
   const controls = useAnimationControls();
 
-  // Fetch data from API on component mount
+  // Fetch data from API after predefined data is loaded
   useEffect(() => {
-    const fetchSiteData = async () => {
-      try {
-        const response = await fetch('/api/content');
-        if (response.ok) {
-          const data = await response.json();
-          // Transform the data to match the expected format
-          const transformedData = [
-            { component: "EnhancedHeroSection", data: data.hero || {} },
-            { component: "ProfessionalSections", data: data.about || {} },
-            { component: "AnnouncementsPreview", data: data.announcements || {} },
-            { component: "ProfessionalHelpSection", data: data.help || {} },
-            { component: "CurrentFundraiser", data: data.campaigns || {} },
-            { component: "StoriesOfImpact", data: data.impact || {} },
-            { component: "DriveGallery", data: data.gallery || {} },
-            { component: "HomePage", data: data.homepage || {} }
-          ];
-          setSiteData(transformedData);
+    const timer = setTimeout(() => {
+      const fetchSiteData = async () => {
+        try {
+          const response = await fetch('https://api.hhoadmin.sreecharandesu.in');
+          if (response.ok) {
+            const data = await response.json();
+            // Validate that the data contains required fields
+            if (
+              data &&
+              data.hero &&
+              data.about &&
+              data.announcements &&
+              data.help &&
+              data.campaigns &&
+              data.impact &&
+              data.gallery &&
+              data.homepage
+            ) {
+              // Transform the data to match the expected format
+              const transformedData = [
+                { component: "EnhancedHeroSection", data: data.hero },
+                { component: "ProfessionalSections", data: data.about },
+                { component: "AnnouncementsPreview", data: data.announcements },
+                { component: "ProfessionalHelpSection", data: data.help },
+                { component: "CurrentFundraiser", data: data.campaigns },
+                { component: "StoriesOfImpact", data: data.impact },
+                { component: "DriveGallery", data: data.gallery },
+                { component: "HomePage", data: data.homepage },
+              ];
+              setSiteData(transformedData);
+              setIsLoading(false); // Only set to false if valid data is received
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching site data:', error);
+          // Do not set isLoading to false; keep using apiData
         }
-      } catch (error) {
-        console.error('Error fetching site data:', error);
-        // Keep using static data as fallback
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
+      fetchSiteData();
+    }, 100); // Small delay to ensure initial render with apiData
 
-    fetchSiteData();
+    return () => clearTimeout(timer);
   }, []);
 
   // Extract data for this component
-  const componentData:any = siteData.find(c => c.component === "HomePage")?.data;
+  const componentData: any = siteData.find((c) => c.component === "HomePage")?.data;
   const config = {
     header: componentData?.header,
     helpPopup: componentData?.helpPopup,
     donatePopup: componentData?.donatePopup,
-    confirmationModal: componentData?.confirmationModal
+    confirmationModal: componentData?.confirmationModal,
   };
 
   // Get icon components
@@ -146,25 +181,25 @@ export default function HomePage() {
   const shareSupport = () => {
     const websiteUrl = window.location.href;
     const shareText = `I just donated ₹${donationAmount} to Helping Hands Organization! Join me in supporting their cause: ${websiteUrl}`;
-    
     if (donationAmount < 100) {
       alert("Please enter a valid donation amount before sharing.");
       return;
     }
-  
     if (navigator.share) {
-      navigator.share({
-        title: "Support Helping Hands Organization",
-        text: shareText,
-        url: websiteUrl,
-      })
-      .then(() => console.log("Content shared successfully"))
-      .catch((error) => {
-        console.error("Error sharing content:", error);
-        alert("Failed to share. Please copy this link: " + shareText);
-      });
+      navigator
+        .share({
+          title: "Support Helping Hands Organization",
+          text: shareText,
+          url: websiteUrl,
+        })
+        .then(() => console.log("Content shared successfully"))
+        .catch((error) => {
+          console.error("Error sharing content:", error);
+          alert("Failed to share. Please copy this link: " + shareText);
+        });
     } else {
-      navigator.clipboard.writeText(shareText)
+      navigator.clipboard
+        .writeText(shareText)
         .then(() => alert("Link copied to clipboard! Paste it to share."))
         .catch(() => alert("Failed to copy. Please manually copy: " + shareText));
     }
@@ -219,7 +254,10 @@ export default function HomePage() {
       };
 
   const bounceAnimation = {
-    animate: { y: [0, -10, 0], transition: { duration: 0.5, repeat: Infinity, ease: "easeInOut" } },
+    animate: {
+      y: [0, -10, 0],
+      transition: { duration: 0.5, repeat: Infinity, ease: "easeInOut" },
+    },
   };
 
   if (isLoading) {
@@ -277,16 +315,21 @@ export default function HomePage() {
               </button>
             ))}
             {config.header?.buttons.map((button: any, index: number) => (
-              <button
+              <motion.a
                 key={index}
-                onClick={button.text === "Donate" ? () => setIsDonatePopupOpen(true) : () => setIsHelpPopupOpen(true)}
+                href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)}`}
                 className={`px-${button.text === "Donate" ? 6 : 4} py-2 ${button.style} rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer`}
+                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
               >
                 {button.text}
-              </button>
+              </motion.a>
             ))}
           </nav>
-          <button className="md:hidden cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button
+            className="md:hidden cursor-pointer"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X className="w-6 h-6 text-red-600" /> : <Menu className="w-6 h-6 text-red-600" />}
           </button>
         </div>
@@ -306,13 +349,16 @@ export default function HomePage() {
                 </button>
               ))}
               {config.header?.buttons.map((button: any, index: number) => (
-                <button
+                <motion.a
                   key={index}
-                  onClick={button.text === "Donate" ? () => setIsDonatePopupOpen(true) : () => setIsHelpPopupOpen(true)}
+                  href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)}`}
                   className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   {button.text}
-                </button>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -374,60 +420,49 @@ export default function HomePage() {
               className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3"
               initial="hidden"
               animate={controls}
-              // @ts-expect-error --- IGNORE ---
               variants={bounceAnimation}
               id="help-popup-title"
             >
               <HelpIcon className="w-7 h-7 text-red-600" />
               {config.helpPopup?.title}
             </motion.h2>
-            <motion.div
-              className="space-y-6"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div className="space-y-6" variants={containerVariants} initial="hidden" animate="visible">
               {config.helpPopup?.details.map((detail: any, index: number) => {
                 const DetailIcon = getIconComponent(detail.icon || "HelpCircle");
                 return (
-                <motion.div
-                  key={index}
-                  className="flex items-start gap-3"
-                  variants={itemVariants}
-                >
-                  {detail.icon && <DetailIcon className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />}
-                  <div>
-                    <h5 className="font-semibold text-gray-900 text-sm mb-1">{detail.label}</h5>
-                    {detail.content.map((item: string, idx: number) => (
-                      <p key={idx} className="text-gray-600 text-sm">
-                        {detail.link && idx === detail.content.length - 1 ? (
-                          <a
-                            href={detail.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-red-600 hover:text-red-700 transition-colors duration-200"
-                          >
-                            {item}
-                          </a>
-                        ) : (
-                          <>
-                            {item}
-                            <button
-                              onClick={() => copyToClipboard(item)}
-                              className="ml-2 text-gray-400 hover:text-red-600"
-                              aria-label={`Copy ${detail.label}`}
+                  <motion.div key={index} className="flex items-start gap-3" variants={itemVariants}>
+                    {detail.icon && <DetailIcon className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />}
+                    <div>
+                      <h5 className="font-semibold text-gray-900 text-sm mb-1">{detail.label}</h5>
+                      {detail.content.map((item: string, idx: number) => (
+                        <p key={idx} className="text-gray-600 text-sm">
+                          {detail.link && idx === detail.content.length - 1 ? (
+                            <a
+                              href={detail.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-red-600 hover:text-red-700 transition-colors duration-200"
                             >
-                              <Copy className="w-4 h-4 inline" />
-                            </button>
-                          </>
-                        )}
-                      </p>
-                    ))}
-                  </div>
-                </motion.div>
-              );
+                              {item}
+                            </a>
+                          ) : (
+                            <>
+                              {item}
+                              <button
+                                onClick={() => copyToClipboard(item)}
+                                className="ml-2 text-gray-400 hover:text-red-600"
+                                aria-label={`Copy ${detail.label}`}
+                              >
+                                <Copy className="w-4 h-4 inline" />
+                              </button>
+                            </>
+                          )}
+                        </p>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
               })}
-      
             </motion.div>
           </motion.div>
         </motion.div>
@@ -488,19 +523,13 @@ export default function HomePage() {
               className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3"
               initial="hidden"
               animate={controls}
-              // @ts-expect-error --- IGNORE ---
               variants={bounceAnimation}
               id="donate-popup-title"
             >
               <DonateIcon className="w-7 h-7 text-red-600" />
               {config.donatePopup?.title}
             </motion.h2>
-            <motion.div
-              className="space-y-8"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
               <motion.p
                 key={messageIndex}
                 className="text-gray-700 text-lg font-medium text-center bg-red-100/50 p-4 rounded-xl"
@@ -511,7 +540,6 @@ export default function HomePage() {
               >
                 {config.donatePopup?.motivationalMessages[messageIndex]}
               </motion.p>
-              {/* @ts-ignore --- */}
               <motion.div className="bg-red-50 p-6 rounded-xl" variants={itemVariants}>
                 <h3 className="text-xl font-semibold text-red-600 mb-4">Payment Methods</h3>
                 <div className="grid grid-cols-1 gap-4">
@@ -519,7 +547,6 @@ export default function HomePage() {
                     <motion.div
                       key={index}
                       className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-                      // @ts-expect-error --- IGNORE ---
                       variants={itemVariants}
                       whileHover={{ y: -2 }}
                     >
@@ -545,13 +572,19 @@ export default function HomePage() {
                   ))}
                 </div>
               </motion.div>
-              {/* @ts-ignore --- */}
               <motion.div className="text-center text-sm text-gray-600" variants={itemVariants}>
                 <p>
                   {config.donatePopup?.donationMessageTemplate
                     .replace("{amount}", donationAmount.toString())
                     .replace("{recurring}", isRecurring ? "monthly" : "")
-                    .replace("{impact}", donationAmount >= 5000 ? config.donatePopup?.impactMessages["5000+"] : donationAmount >= 1000 ? config.donatePopup?.impactMessages["1000-4999"] : config.donatePopup?.impactMessages.default)
+                    .replace(
+                      "{impact}",
+                      donationAmount >= 5000
+                        ? config.donatePopup?.impactMessages["5000+"]
+                        : donationAmount >= 1000
+                        ? config.donatePopup?.impactMessages["1000-4999"]
+                        : config.donatePopup?.impactMessages.default
+                    )
                     .replace("{donorName}", donorName || "Friend")}
                 </p>
               </motion.div>
@@ -588,36 +621,26 @@ export default function HomePage() {
             >
               <X className="w-6 h-6" />
             </button>
-            <motion.div
-              className="text-center"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div className="text-center" variants={containerVariants} initial="hidden" animate="visible">
               <motion.div variants={itemVariants}>
                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
               </motion.div>
-              <motion.h2
-                className="text-2xl font-bold text-gray-900 mb-4"
-                id="confirmation-title"
-                variants={itemVariants}
-              >
+              <motion.h2 className="text-2xl font-bold text-gray-900 mb-4" id="confirmation-title" variants={itemVariants}>
                 {config.confirmationModal?.title}
               </motion.h2>
-                            {/* @ts-ignore --- */}
               <motion.p className="text-gray-600 mb-6" variants={itemVariants}>
                 {config.confirmationModal?.message.replace("{amount}", donationAmount.toString())}
               </motion.p>
-                            {/* @ts-ignore --- */}
-              <motion.button
-                onClick={() => setIsConfirmationOpen(false)}
+              <motion.a
+                href={`mailto:hho@rguktong.ac.in?subject=Donation%20Confirmation&body=${encodeURIComponent(`I have donated ₹${donationAmount}. ${config.confirmationModal?.message.replace("{amount}", donationAmount.toString()) || 'Thank you for processing my donation.'}`)}`}
                 className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-all duration-200"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 variants={itemVariants}
+                onClick={() => setIsConfirmationOpen(false)}
               >
                 {config.confirmationModal?.button}
-              </motion.button>
+              </motion.a>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -635,19 +658,11 @@ export default function HomePage() {
           <ProfessionalSections />
         </motion.div>
       </section>
-
-      <motion.section
-        className="relative z-10 bg-gray-50"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <motion.section className="relative z-10 bg-gray-50" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <AnnouncementsPreview />
         </div>
       </motion.section>
-
       <section ref={initiativesRef} className="relative z-10">
         <motion.div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
@@ -659,17 +674,17 @@ export default function HomePage() {
           <ProfessionalHelpSection />
         </motion.div>
       </section>
-<section ref={initiativesRef} className="relative z-10">
-  <motion.div
-    className="w-full px-0 py-16" // Changed from max-w-7xl and adjusted padding
-    variants={containerVariants}
-    initial="hidden"
-    whileInView="visible"
-    viewport={{ once: true, amount: 0.2 }}
-  >
-    <DriveGallery />
-  </motion.div>
-</section>
+      <section ref={initiativesRef} className="relative z-10">
+        <motion.div
+          className="w-full px-0 py-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <DriveGallery />
+        </motion.div>
+      </section>
       <section ref={impactRef} className="relative z-10">
         <motion.div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
@@ -681,7 +696,6 @@ export default function HomePage() {
           <StoriesOfImpact />
         </motion.div>
       </section>
-
       <section ref={eventsRef} className="relative z-10 bg-gray-50">
         <motion.div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
@@ -693,14 +707,7 @@ export default function HomePage() {
           <CurrentFundraiser />
         </motion.div>
       </section>
-
-      <motion.div
-        className="relative z-10"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <motion.div className="relative z-10" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
         <HHOFooter />
       </motion.div>
     </div>

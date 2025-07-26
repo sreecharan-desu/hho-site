@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+"use client";
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -16,7 +19,7 @@ const StoriesOfImpact: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
   // Extract data for this component
-  const componentData:any = apiData.find(c => c.component === "StoriesOfImpact")?.data;
+  const componentData: any = apiData.find((c) => c.component === "StoriesOfImpact")?.data;
   const testimonials: Testimonial[][] = componentData?.testimonials || [];
 
   const containerVariants = {
@@ -83,7 +86,6 @@ const StoriesOfImpact: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-20">
           <motion.h2
-            // @ts-expect-error ---
             variants={itemVariants}
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-8 leading-tight"
           >
@@ -92,25 +94,14 @@ const StoriesOfImpact: React.FC = () => {
           </motion.h2>
 
           <motion.p
-            // @ts-expect-error ---
             variants={itemVariants}
             className="text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
             {componentData?.description}
           </motion.p>
 
-          <motion.button
-            // @ts-expect-error ---
-            variants={itemVariants}
-            className="mt-8 px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all duration-300 shadow-md"
-            whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
-            whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-          >
-            {componentData?.ctaButton}
-          </motion.button>
-
+ 
           <motion.div
-            // @ts-expect-error ---
             variants={itemVariants}
             className="w-32 h-1 bg-gradient-to-r from-red-600 to-red-400 mx-auto mt-10"
             initial={{ width: 0 }}
@@ -133,14 +124,12 @@ const StoriesOfImpact: React.FC = () => {
               {column.map((testimonial, index) => (
                 <motion.div
                   key={index}
-                  // @ts-expect-error ---
                   variants={itemVariants}
                   whileHover={{ y: -8, boxShadow: "0 12px 30px rgba(0, 0, 0, 0.05)" }}
                   className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg min-h-[250px] flex flex-col justify-between"
                 >
                   <div className="flex items-start mb-6">
                     {testimonial.avatar.startsWith("http") ? (
-                      // @ts-expect-error ---
                       <motion.img
                         src={testimonial.avatar}
                         alt={testimonial.name}
@@ -148,7 +137,6 @@ const StoriesOfImpact: React.FC = () => {
                         {...pulseAnimation}
                       />
                     ) : (
-                      // @ts-expect-error ---
                       <motion.div
                         className={`w-12 h-12 rounded-full ${testimonial.avatarBg || "bg-gray-700"} flex items-center justify-center text-white font-bold text-lg mr-4 flex-shrink-0`}
                         {...pulseAnimation}

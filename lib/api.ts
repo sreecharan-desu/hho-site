@@ -193,18 +193,6 @@ export const apiData = [
           highlightedWords: ["Big"],
           subtitle: "Together, we create hope and support during life's most challenging moments. Join our community dedicated to making a meaningful difference.",
           cta: "Start Making a Difference"
-        },
-        {
-          title: "Every Drop Counts",
-          highlightedWords: ["Drop"],
-          subtitle: "Your generosity creates ripples of change that reach far beyond what you can imagine. Be part of something bigger.",
-          cta: "Join the Movement"
-        },
-        {
-          title: "Building Tomorrow",
-          highlightedWords: ["Tomorrow"],
-          subtitle: "Through compassion and community action, we're creating lasting solutions for those who need it most.",
-          cta: "Build With Us"
         }
       ],
       features: [
@@ -212,7 +200,6 @@ export const apiData = [
         { icon: "Users", text: "Community Driven", color: "text-blue-500" },
         { icon: "Heart", text: "Transparent Impact", color: "text-purple-500" }
       ],
-      scrollPrompt: "Scroll to explore",
       accessibility: {
         skipLink: "Skip to main content",
         logoAlt: "Charity organization logo"
@@ -225,7 +212,6 @@ export const apiData = [
       title: "See why people love HHO",
       highlightedTitle: "HHO",
       description: "Read the impact we’ve had from people across communities.",
-      ctaButton: "Get started →",
       testimonials: [
         [
           {
