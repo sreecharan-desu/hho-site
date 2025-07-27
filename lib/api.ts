@@ -343,8 +343,6 @@ export const apiData = [
         ]
       },
       donatePopup: {
-        title: "Support Our Cause",
-        icon: "DollarSign",
         motivationalMessages: [
           "Your donation can change lives! Every contribution brings hope and support.",
           "Together, we can make a difference—donate today!",

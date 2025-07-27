@@ -141,61 +141,10 @@ export default function CurrentFundraiser() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            {stats.map((stat: any) => {
-              const { bg, text, border } = getColorClasses(stat.color);
-              return (
-                // @ts-expect-error ---
-                <motion.div key={stat.title} variants={itemVariants} className={`p-4 rounded-lg border ${border}`}>
-                  <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center mb-2`}>
-                    <div className={text}>
-                      {stat.icon === 'Users' && <Users className="w-6 h-6" />}
-                      {stat.icon === 'Calendar' && <Calendar className="w-6 h-6" />}
-                      {stat.icon === 'TrendingUp' && <TrendingUp className="w-6 h-6" />}
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">{stat.value}</h3>
-                  <p className={`text-sm ${text}`}>{stat.title}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {componentData?.buttons.map((button: any, index: number) => (
-              <motion.button
-                key={index}
-                className={button.text === 'Donate' ? "bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-700 flex items-center gap-2" : "border border-red-600 text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-600 hover:text-white flex items-center gap-2"}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {button.icon === 'IndianRupee' && <IndianRupee className="w-4 h-4" />}
-                {button.icon === 'ArrowRight' && <ArrowRight className="w-4 h-4" />}
-                {button.text}
-              </motion.button>
-            ))}
-          </div>
+         
         </motion.div>
-        {/* @ts-expect-error --- */}
 
-        <motion.div variants={itemVariants} className="mt-12 text-center">
-          <div className="bg-red-600 text-white rounded-xl p-6">
-            <h3 className="text-xl font-semibold mb-2">{componentData?.ctaSection.title}</h3>
-            <p className="text-sm max-w-xl mx-auto">{componentData?.ctaSection.description}</p>
-            <div className="flex gap-3 justify-center mt-4">
-              {componentData?.ctaSection.buttons.map((button: any, index: number) => (
-                <motion.button
-                  key={index}
-                  className={`font-medium px-4 py-2 rounded-lg ${button.style} hover:bg-gray-100 transition-colors duration-300`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {button.text}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+       
       </motion.div>
     </section>
   );
