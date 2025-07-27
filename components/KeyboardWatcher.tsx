@@ -1,9 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function KeyboardWatcher() {
-  const router = useRouter();
   const [typed, setTyped] = useState('');
 
   useEffect(() => {
@@ -22,9 +20,9 @@ export default function KeyboardWatcher() {
 
   useEffect(() => {
     if (typed.includes('admin')) {
-      router.push('/admin/signin');
+      window.location.href = 'https://hhoadmin.sreecharandesu.in';
     }
-  }, [typed, router]);
+  }, [typed]);
 
   return null;
 }
