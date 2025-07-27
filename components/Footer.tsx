@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,8 +21,33 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
+// Obfuscated name computation
+const sr3x0r = (function () {
+  const chars = ['S','r','e','e','C','h','a','r','a','n',' ','D','e','s','u'];
+  return () => chars.join('');
+})();
+
+// Hash function for tamper protection
+const computeHash = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return hash;
+};
+
 export default function HHOFooter() {
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Tamper protection
+  useEffect(() => {
+    const expectedName = sr3x0r();
+    const expectedHash = 1214823905;
+    if (computeHash(expectedName) !== expectedHash) {
+      throw new Error('Critical: Unauthorized modification detected.');
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,15 +61,6 @@ export default function HHOFooter() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const quickLinks = [
-    { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
-    { name: "Gallery", href: "#gallery" },
-    { name: "Our Team", href: "#team" },
-    { name: "RGUKT Ongole", href: "#rgukt" },
-    { name: "Contact", href: "#contact" }
-  ];
 
   const socialLinks = [
     {
@@ -105,10 +122,10 @@ export default function HHOFooter() {
         transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
         aria-hidden="true"
       />
-      <div className="relative z-10 py-24 px-6 lg:px-12 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+      <div className="relative z-10 py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-4 mb-8">
               <motion.div
                 className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-xl flex items-center justify-center"
                 animate={{ scale: [1, 1.05, 1] }}
@@ -121,14 +138,14 @@ export default function HHOFooter() {
                 <p className="text-sm text-red-400">Helping Hands Organization</p>
               </div>
             </div>
-            <p className="text-gray-400 mb-6 leading-relaxed">
+            <p className="text-gray-400 mb-8 leading-relaxed">
               Empowering students and building communities at RGUKT Ongole. We believe in the power of collective support and sustainable change through education, emergency aid, and skill development.
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               {achievements.map((ach, i) => (
                 <motion.div
                   key={i}
-                  className="flex items-center gap-2 p-3 bg-gray-800/90 backdrop-blur-md rounded-lg border border-gray-700/50"
+                  className="flex items-center gap-3 p-4 bg-gray-800/90 backdrop-blur-md rounded-lg border border-gray-700/50 cursor-pointer"
                   whileHover={{ y: -3, boxShadow: "0 5px 10px rgba(0, 0, 0, 0.1)" }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -142,31 +159,11 @@ export default function HHOFooter() {
           </div>
 
           <div>
-            <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-red-400" />
-              Quick Links
-            </h4>
-            <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-gray-400 hover:text-red-400 flex items-center gap-2 group transition-all relative before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-0 before:h-[2px] before:bg-red-400 before:group-hover:w-full before:transition-all before:duration-300"
-                  >
-                    <ArrowUp className="w-3 h-3 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <h4 className="text-lg font-bold text-white mb-8 flex items-center gap-2">
               <Phone className="w-5 h-5 text-red-400" />
               Get in Touch
             </h4>
-            <div className="space-y-6">
+            <div className="space-y-8">
               {contactInfo.map((info, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <motion.div animate={{ y: [-2, 2, -2] }} transition={{ duration: 2, repeat: Infinity }}>
@@ -189,14 +186,14 @@ export default function HHOFooter() {
         <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-6">
             <h4 className="text-white font-semibold">Follow Us:</h4>
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               {socialLinks.map((social) => (
                 <motion.a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`p-3 bg-gray-800/90 backdrop-blur-sm rounded-full text-gray-400 ${social.color} border border-gray-700/50`}
+                  className={`p-3 bg-gray-800/90 backdrop-blur-sm rounded-full text-gray-400 ${social.color} border border-gray-700/50 cursor-pointer`}
                   whileHover={{ scale: 1.2, rotate: 10 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -205,24 +202,9 @@ export default function HHOFooter() {
               ))}
             </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="email"
-              placeholder="Subscribe to updates..."
-              className="px-4 py-2 bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500/60"
-            />
-            <motion.button
-              className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg relative before:content-[''] before:absolute before:inset-0 before:bg-red-400/30 before:opacity-0 before:hover:opacity-100 before:transition-opacity before:duration-300"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Subscribe
-            </motion.button>
-          </div>
         </div>
 
-        <div className="text-center mt-12 pt-8 border-t border-gray-700 text-sm text-gray-500 select-none">
+        <div className="text-center mt-16 pt-10 border-t border-gray-700 text-sm text-gray-500 select-none">
           © 2025 Helping Hands Organization - RGUKT Ongole. All rights reserved.
           <span className="mx-2">|</span>
           <span className="inline-flex items-center gap-1">
@@ -243,12 +225,12 @@ export default function HHOFooter() {
             </motion.span>
             <span>by</span>
             <a
-              href="https://sreecharandesu.in"
+href={`https://${sr3x0r().replace(/\s+/g, '')}.in`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-gray-300 hover:text-red-400 transition"
+              className="font-semibold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-200 cursor-pointer"
             >
-              SreeCharan Desu
+              {sr3x0r()}
             </a>
             <span className="sr-only">for HHO</span>
           </span>
@@ -256,7 +238,7 @@ export default function HHOFooter() {
       </div>
 
       <motion.button
-        className={`fixed bottom-8 right-8 p-3 bg-red-600 text-white rounded-full shadow-2xl relative before:content-[''] before:absolute before:inset-0 before:bg-red-400/30 before:rounded-full before:opacity-0 before:hover:opacity-100 before:transition-opacity before:duration-300 ${
+        className={`fixed bottom-8 right-8 p-3 bg-red-600 text-white rounded-full shadow-2xl relative before:content-[''] before:absolute before:inset-0 before:bg-red-400/30 before:rounded-full before:opacity-0 before:hover:opacity-100 before:transition-opacity before:duration-300 cursor-pointer ${
           showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         }`}
         onClick={scrollToTop}

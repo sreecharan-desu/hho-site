@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 "use client";
 
@@ -75,12 +76,17 @@ export default function HomePage() {
   const [donorName, setDonorName] = useState("");
   const [donorEmail, setDonorEmail] = useState("");
   const [isRecurring, setIsRecurring] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [siteData, setSiteData] = useState(apiData); // Fallback to static data
   const [isLoading, setIsLoading] = useState(false);
+  const [isUrgent, setIsUrgent] = useState(
+    apiData.find((c) => c.component === "AnnouncementsPreview")?.data.announcements.some((a) => a.priority === "high") || false
+  ); // Derive urgency from high-priority announcements
   const aboutRef = useRef(null);
   const initiativesRef = useRef(null);
   const eventsRef = useRef(null);
   const impactRef = useRef(null);
+  const announcementsRef = useRef(null); // Ref for Announcements section
   const shouldReduceMotion = useReducedMotion();
   const controls = useAnimationControls();
 
@@ -92,7 +98,6 @@ export default function HomePage() {
           const response = await fetch('https://api.hhoadmin.sreecharandesu.in');
           if (response.ok) {
             const data = await response.json();
-            // Validate that the data contains required fields
             if (
               data &&
               data.hero &&
@@ -104,7 +109,6 @@ export default function HomePage() {
               data.gallery &&
               data.homepage
             ) {
-              // Transform the data to match the expected format
               const transformedData = [
                 { component: "EnhancedHeroSection", data: data.hero },
                 { component: "ProfessionalSections", data: data.about },
@@ -116,16 +120,19 @@ export default function HomePage() {
                 { component: "HomePage", data: data.homepage },
               ];
               setSiteData(transformedData);
-              setIsLoading(false); // Only set to false if valid data is received
+              setIsLoading(false);
+              // Update isUrgent based on fetched announcements
+              setIsUrgent(
+                transformedData.find((c) => c.component === "AnnouncementsPreview")?.data.announcements.some((a) => a.priority === "high") || false
+              );
             }
           }
         } catch (error) {
           console.error('Error fetching site data:', error);
-          // Do not set isLoading to false; keep using apiData
         }
       };
       fetchSiteData();
-    }, 100); // Small delay to ensure initial render with apiData
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
@@ -139,7 +146,6 @@ export default function HomePage() {
     confirmationModal: componentData?.confirmationModal,
   };
 
-  // Get icon components
   const HelpIcon = getIconComponent(config.helpPopup?.icon || "HelpCircle");
   const DonateIcon = getIconComponent(config.donatePopup?.icon || "DollarSign");
 
@@ -170,7 +176,11 @@ export default function HomePage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      alert("Copied to clipboard!");
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }).catch((error) => {
+      console.error('Error copying to clipboard:', error);
+      alert("Failed to copy. Please copy manually: " + text);
     });
   };
 
@@ -297,10 +307,9 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.scrollTo(0,0)}>
             <img src="/logo.png" alt={config.header?.logoAlt} className="w-10 h-10" />
             <h1 className="text-2xl font-bold text-red-600">{config.header?.brand}</h1>
           </div>
@@ -315,22 +324,34 @@ export default function HomePage() {
               </button>
             ))}
             {config.header?.buttons.map((button: any, index: number) => (
-              <motion.a
-                key={index}
-                href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)}`}
-                className={`px-${button.text === "Donate" ? 6 : 4} py-2 ${button.style} rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer`}
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
-              >
-                {button.text}
-              </motion.a>
+              button.text === "Donate" ? (
+                <motion.button
+                  key={index}
+                  onClick={openDonatePopup}
+                  className={`px-${button.text === "Donate" ? 6 : 4} py-2 ${button.style} rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer`}
+                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
+                >
+                  {button.text}
+                </motion.button>
+              ) : (
+                <motion.a
+                  key={index}
+                  href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)}`}
+                  className={`px-${button.text === "Donate" ? 6 : 4} py-2 ${button.style} rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer`}
+                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
+                >
+                  {button.text}
+                </motion.a>
+              )
             ))}
           </nav>
           <button
             className="md:hidden cursor-pointer"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6 text-red-600" /> : <Menu className="w-6 h-6 text-red-600" />}
+            {isMenuOpen ? <X className="w-6 h-6 text-red-600 cursor-pointer" /> : <Menu className="w-6 h-6 text-red-600 cursor-pointer" />}
           </button>
         </div>
         {isMenuOpen && (
@@ -343,27 +364,94 @@ export default function HomePage() {
                     scrollToSection(eval(item.ref));
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left text-sm font-medium text-gray-700 hover:text-red-600 cursor-pointer"
+                  className="block w-full text-left text-sm font-medium text-gray-700 hover:text-red-600 transition-colors duration-200 cursor-pointer"
                 >
                   {item.name}
                 </button>
               ))}
               {config.header?.buttons.map((button: any, index: number) => (
-                <motion.a
-                  key={index}
-                  href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)}`}
-                  className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {button.text}
-                </motion.a>
+                button.text === "Donate" ? (
+                  <motion.button
+                    key={index}
+                    onClick={() => {
+                      openDonatePopup();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                    whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                    whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
+                  >
+                    {button.text}
+                  </motion.button>
+                ) : (
+                  <motion.a
+                    key={index}
+                    href={`mailto:hho@rguktong.ac.in?subject=Inquiry%20about%20${encodeURIComponent(button.text || 'Support')}&body=${encodeURIComponent(`I am reaching out regarding ${button.text || 'Support'}. Please provide more information.`)} `}
+                    className="block w-full text-center px-6 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                    whileHover={{ scale: shouldReduceMotion ? 1 : 1.05 }}
+                    whileTap={{ scale: shouldReduceMotion ? 1 : 0.95 }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {button.text}
+                  </motion.a>
+                )
               ))}
             </div>
           </div>
         )}
       </header>
+
+      {/* Urgent Help Banner */}
+      {isUrgent && siteData.some((c) => c.component === "UrgentHelpAlert") && (
+        <motion.div
+          className="fixed top-46 left-0 right-0 z-50 bg-red-600 text-white py-3 px-4 sm:px-6 shadow-lg cursor-pointer"
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          whileHover={{ scale: 1.02 }}
+          {...(!shouldReduceMotion && {
+            animate: { scale: [1, 1.02, 1], opacity: [1, 0.95, 1] },
+            transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+          })}
+          onClick={() => scrollToSection(announcementsRef)}
+          role="alert"
+          aria-label="Urgent help required banner"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <motion.div
+                className="flex-shrink-0"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <HelpCircle className="w-6 h-6 text-white" />
+              </motion.div>
+              <p className="text-sm sm:text-base font-semibold">
+                Immediate Help Required: Support a student in need!{" "}
+                <span className="underline hover:text-gray-200 transition-colors duration-200 cursor-pointer">
+                  View Announcements
+                </span>
+              </p>
+            </div>
+            <motion.button
+              className="bg-white text-red-600 px-4 py-1 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                scrollToSection(announcementsRef);
+              }}
+              aria-label="View urgent announcements"
+            >
+              Act Now
+            </motion.button>
+          </div>
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-red-700/20 to-orange-300/20"
+            aria-hidden="true"
+          />
+        </motion.div>
+      )}
 
       {/* Help Popup */}
       {isHelpPopupOpen && (
@@ -411,7 +499,7 @@ export default function HomePage() {
             )}
             <button
               onClick={() => setIsHelpPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-red-600 transition-colors duration-200"
+              className="absolute top-4 right-4 text-gray-600 hover:text-red-600 transition-colors duration-200 cursor-pointer"
               aria-label="Close help popup"
             >
               <X className="w-6 h-6" />
@@ -441,20 +529,13 @@ export default function HomePage() {
                               href={detail.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-red-600 hover:text-red-700 transition-colors duration-200"
+                              className="text-red-600 hover:text-red-700 transition-colors duration-200 cursor-pointer"
                             >
                               {item}
                             </a>
                           ) : (
                             <>
                               {item}
-                              <button
-                                onClick={() => copyToClipboard(item)}
-                                className="ml-2 text-gray-400 hover:text-red-600"
-                                aria-label={`Copy ${detail.label}`}
-                              >
-                                <Copy className="w-4 h-4 inline" />
-                              </button>
                             </>
                           )}
                         </p>
@@ -471,124 +552,198 @@ export default function HomePage() {
       {/* Donate Popup */}
       {isDonatePopupOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-gradient-to-b from-black/80 to-gray-900/80 backdrop-blur-xl flex items-center justify-center z-50 p-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           aria-labelledby="donate-popup-title"
           role="dialog"
           tabIndex={-1}
           onKeyDown={(e) => e.key === "Escape" && setIsDonatePopupOpen(false)}
         >
           <motion.div
-            className="bg-white/90 rounded-3xl p-6 sm:p-8 max-w-lg w-full relative shadow-2xl border border-gray-200"
-            style={{ backdropFilter: "blur(10px)" }}
-            initial={{ y: 100, opacity: 0, scale: 0.9 }}
+            className="bg-white/95 rounded-3xl p-6 max-w-5xl w-full relative shadow-2xl border border-gray-100/20 overflow-hidden"
+            style={{ backdropFilter: "blur(12px)" }}
+            initial={{ y: 150, opacity: 0, scale: 0.85 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 100, opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            exit={{ y: 150, opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-red-100/40 to-transparent rounded-3xl" aria-hidden="true" />
-            {!shouldReduceMotion && (
-              <div className="absolute inset-0" aria-hidden="true">
-                {[...Array(4)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-3 h-3 rounded-full bg-red-200/40"
-                    style={{ left: `${15 + (i * 25)}%`, top: `${15 + (i * 25)}%` }}
-                    animate={{
-                      y: [-8, 8, -8],
-                      opacity: [0.3, 0.7, 0.3],
-                      scale: [0.8, 1.2, 0.8],
-                    }}
-                    transition={{
-                      duration: 5 + i * 1.2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.3,
-                    }}
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-red-300/50 via-pink-200/40 to-orange-300/50"
+              aria-hidden="true"
+            />
+            {isCopied && (
+              <motion.div
+                className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500/90 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 cursor-pointer"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                onClick={() => setIsCopied(false)}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
                   />
-                ))}
-              </div>
+                </svg>
+                Copied to clipboard!
+              </motion.div>
             )}
             <button
               onClick={() => setIsDonatePopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-red-600 transition-colors duration-200"
+              className="absolute top-3 right-3 text-gray-600 hover:text-red-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full p-1.5 bg-white/80 shadow-md cursor-pointer"
               aria-label="Close donate popup"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
-            <motion.h2
-              className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3"
-              initial="hidden"
-              animate={controls}
-              variants={bounceAnimation}
-              id="donate-popup-title"
-            >
-              <DonateIcon className="w-7 h-7 text-red-600" />
-              {config.donatePopup?.title}
-            </motion.h2>
-            <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
-              <motion.p
-                key={messageIndex}
-                className="text-gray-700 text-lg font-medium text-center bg-red-100/50 p-4 rounded-xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
+            <div className="flex flex-col md:flex-row gap-6">
+              <motion.div
+                className="w-full md:w-1/3 flex flex-col items-center justify-center space-y-6 p-6 bg-white/30 rounded-2xl shadow-inner"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
               >
-                {config.donatePopup?.motivationalMessages[messageIndex]}
-              </motion.p>
-              <motion.div className="bg-red-50 p-6 rounded-xl" variants={itemVariants}>
-                <h3 className="text-xl font-semibold text-red-600 mb-4">Payment Methods</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  {config.donatePopup?.paymentMethods.map((detail: any, index: number) => (
-                    <motion.div
-                      key={index}
-                      className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-                      variants={itemVariants}
-                      whileHover={{ y: -2 }}
-                    >
-                      <h4 className="font-medium text-gray-900 mb-2">{detail.label}</h4>
-                      {detail.content.map((item: string, idx: number) => (
-                        <p key={idx} className="text-gray-600 text-sm flex items-center gap-2">
-                          {item}
-                          <button
-                            onClick={() => copyToClipboard(item)}
-                            className="text-gray-400 hover:text-red-600 transition-colors"
-                            aria-label={`Copy ${detail.label}`}
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.15, rotate: 8 }}
+                  transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+                  className="cursor-pointer"
+                >
+                  <svg
+                    className="w-20 h-20 text-red-700 drop-shadow-md"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.8"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                  <p className="text-xs font-semibold text-gray-800 mt-2 drop-shadow-sm">Transform Lives</p>
+                </motion.div>
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.15, rotate: -8 }}
+                  transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+                  className="cursor-pointer"
+                >
+                  <svg
+                    className="w-20 h-20 text-orange-700 drop-shadow-md"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.8"
+                      d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"
+                    />
+                  </svg>
+                  <p className="text-xs font-semibold text-gray-800 mt-2 drop-shadow-sm">Spread Hope</p>
+                </motion.div>
+              </motion.div>
+              <motion.div
+                className="w-full md:w-2/3 space-y-6 p-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.h2
+                  className="text-2xl font-extrabold text-gray-900 flex items-center gap-2 drop-shadow-md"
+                  variants={itemVariants}
+                  id="donate-popup-title"
+                >
+                  {config.donatePopup?.title}
+                  <motion.span
+                    className="inline-block"
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
+                    </svg>
+                  </motion.span>
+                </motion.h2>
+                <motion.p
+                  key={messageIndex}
+                  className="text-gray-800 text-base font-medium text-center bg-gradient-to-r from-red-200/80 to-orange-200/80 p-4 rounded-xl shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  {config.donatePopup?.motivationalMessages[messageIndex]}
+                </motion.p>
+                <motion.div className="bg-white/90 p-4 rounded-xl shadow-md" variants={itemVariants}>
+                  <h3 className="text-base font-semibold text-red-700 mb-3">Payment Methods</h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {config.donatePopup?.paymentMethods.map((detail: any, index: number) => (
+                      <motion.div
+                        key={index}
+                        className="bg-white p-3 rounded-lg border border-gray-100/20 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                        variants={itemVariants}
+                        whileHover={{ y: -5, boxShadow: "0 6px 24px rgba(239, 68, 68, 0.25)" }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => copyToClipboard(detail.content.join("\n"))}
+                      >
+                        <h4 className="font-semibold text-gray-900 text-sm mb-1">{detail.label}</h4>
+                        {detail.content.map((item: string, idx: number) => (
+                          <p key={idx} className="text-gray-600 text-xs flex items-center gap-2">
+                            {item}
+                          </p>
+                        ))}
+                        {detail.qr && (
+                          <motion.div
+                            className="flex justify-center mt-3 cursor-pointer"
+                            whileHover={{ scale: 1.08 }}
+                            transition={{ duration: 0.3 }}
                           >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                        </p>
-                      ))}
-                      {detail.qr && (
-                        <div className="flex justify-center mt-3">
-                          <img src={detail.qr} alt="UPI QR Code" className="w-40 h-40 rounded-lg shadow-sm" />
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
+                            <img
+                              src={detail.qr}
+                              alt="UPI QR Code"
+                              className="w-32 h-32 rounded-lg shadow-md border border-gray-100/20 brightness-125"
+                            />
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+                <motion.div className="text-center text-xs text-gray-700" variants={itemVariants}>
+                  <p className="bg-gray-50/95 p-3 rounded-lg shadow-sm drop-shadow-sm">
+                    {config.donatePopup?.donationMessageTemplate
+                      .replace("{amount}", donationAmount.toString())
+                      .replace("{recurring}", isRecurring ? "monthly" : "")
+                      .replace(
+                        "{impact}",
+                        donationAmount >= 5000
+                          ? config.donatePopup?.impactMessages["5000+"]
+                          : donationAmount >= 1000
+                          ? config.donatePopup?.impactMessages["1000-4999"]
+                          : config.donatePopup?.impactMessages.default
+                      )
+                      .replace("{donorName}", donorName || "Friend")}
+                  </p>
+                </motion.div>
               </motion.div>
-              <motion.div className="text-center text-sm text-gray-600" variants={itemVariants}>
-                <p>
-                  {config.donatePopup?.donationMessageTemplate
-                    .replace("{amount}", donationAmount.toString())
-                    .replace("{recurring}", isRecurring ? "monthly" : "")
-                    .replace(
-                      "{impact}",
-                      donationAmount >= 5000
-                        ? config.donatePopup?.impactMessages["5000+"]
-                        : donationAmount >= 1000
-                        ? config.donatePopup?.impactMessages["1000-4999"]
-                        : config.donatePopup?.impactMessages.default
-                    )
-                    .replace("{donorName}", donorName || "Friend")}
-                </p>
-              </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -616,7 +771,7 @@ export default function HomePage() {
           >
             <button
               onClick={() => setIsConfirmationOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-red-600 transition-colors duration-200"
+              className="absolute top-4 right-4 text-gray-600 hover:text-red-600 transition-colors duration-200 cursor-pointer"
               aria-label="Close confirmation modal"
             >
               <X className="w-6 h-6" />
@@ -633,7 +788,7 @@ export default function HomePage() {
               </motion.p>
               <motion.a
                 href={`mailto:hho@rguktong.ac.in?subject=Donation%20Confirmation&body=${encodeURIComponent(`I have donated ₹${donationAmount}. ${config.confirmationModal?.message.replace("{amount}", donationAmount.toString()) || 'Thank you for processing my donation.'}`)}`}
-                className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-all duration-200"
+                className="w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-all duration-200 cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 variants={itemVariants}
@@ -658,11 +813,17 @@ export default function HomePage() {
           <ProfessionalSections />
         </motion.div>
       </section>
-      <motion.section className="relative z-10 bg-gray-50" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section ref={announcementsRef} className="relative z-10 bg-gray-50">
+        <motion.div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           <AnnouncementsPreview />
-        </div>
-      </motion.section>
+        </motion.div>
+      </section>
       <section ref={initiativesRef} className="relative z-10">
         <motion.div
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
