@@ -56,7 +56,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head />
+      <head>
+            <meta name="viewport" content="width=1024" />
+      </head>
       <body className={`${inter.className} bg-white text-black antialiased`}>
         <KeyboardWatcher />
         {children}
