@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 
 "use client";
@@ -5,17 +6,40 @@
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { Bell, Clock, MapPin } from "lucide-react";
-import { apiData } from "@/lib/api";
 
 export default function AnnouncementsPreview() {
   const [visibleSection, setVisibleSection] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const sectionRef = useRef(null);
 
-  const componentData: any = apiData.find(c => c.component === "AnnouncementsPreview")?.data;
+  // Static announcements data
+  const announcements = [
+    {
+      id: "1",
+      title: "Weekly One Rupee Challenge",
+      message: "Join our Weekly One Rupee Challenge! Donate just 1 rupee this week to support our community initiatives. Every small contribution makes a big impact!",
+      priority: "high",
+      time: "Ongoing",
+      location: "Online",
+    },
+    {
+      id: "2",
+      title: "Celebrate Your Friend's Birthday",
+      message: "Is it your friend's birthday this week? Make it special by donating 100 rupees in their honor to support our cause!",
+      priority: "medium",
+      time: "This Week",
+      location: "Online",
+    },
+  ];
+
+  // Static section metadata
+  const sectionData = {
+    sectionLabel: "Campaign Updates",
+    title: "Join Our Donation Challenges",
+    highlightedTitle: "Donation Challenges",
+    loadingMessage: "Loading announcements...",
+    errorMessage: "Failed to load announcements.",
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -35,11 +59,6 @@ export default function AnnouncementsPreview() {
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  useEffect(() => {
-    setAnnouncements(componentData?.announcements || []);
-    setLoading(false);
-  }, [componentData]);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -58,13 +77,13 @@ export default function AnnouncementsPreview() {
     }
   };
 
-  const getPriorityColor = (priority: any) => {
+  const getPriorityColor = (priority: string) => {
     const colors: any = {
       high: "border-l-red-500 bg-red-50/90",
       medium: "border-l-blue-500 bg-blue-50/90",
       low: "border-l-green-500 bg-green-50/90",
     };
-    return colors[priority];
+    return colors[priority] || colors.low;
   };
 
   return (
@@ -96,11 +115,11 @@ export default function AnnouncementsPreview() {
             <motion.div animate={{ y: [-2, 2, -2] }} transition={{ duration: 2, repeat: Infinity }}>
               <Bell className="w-5 h-5" />
             </motion.div>
-            {componentData?.sectionLabel}
+            {sectionData.sectionLabel}
           </motion.div>
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
-            {componentData?.title.replace(componentData?.highlightedTitle, '')}
-            <span className="text-red-600">{componentData?.highlightedTitle}</span>
+            {sectionData.title.replace(sectionData.highlightedTitle, '')}
+            <span className="text-red-600">{sectionData.highlightedTitle}</span>
           </h2>
           <motion.div
             variants={itemVariants}
@@ -111,45 +130,39 @@ export default function AnnouncementsPreview() {
           />
         </motion.div>
 
-        {loading ? (
-          <p className="text-center text-gray-600 text-lg">{componentData?.loadingMessage}</p>
-        ) : error ? (
-          <p className="text-center text-red-600 text-lg">{componentData?.errorMessage}</p>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-10">
-            {announcements.map((announcement: any) => (
-              <motion.div
-                key={announcement.id}
-                variants={itemVariants}
-                className={`group relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-md border-l-4 ${getPriorityColor(
-                  announcement.priority
-                )} overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-${announcement.priority}-400/20 before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-300`}
-                whileHover={{ y: -4, rotateX: 3, rotateY: 3, boxShadow: "0 15px 25px rgba(0, 0, 0, 0.1)" }}
-                transition={{ type: "spring", stiffness: 250 }}
-              >
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-red-600 transition-colors duration-300">
-                    {announcement.title}
-                  </h3>
-                  <p className="text-gray-700 mb-4 leading-relaxed">{announcement.message}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-red-600" />
-                      <span>{announcement.time}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-red-600" />
-                      <span>{announcement.location}</span>
-                    </div>
+        <div className="grid md:grid-cols-2 gap-10">
+          {announcements.map((announcement) => (
+            <motion.div
+              key={announcement.id}
+              variants={itemVariants}
+              className={`group relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-md border-l-4 ${getPriorityColor(
+                announcement.priority
+              )} overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r before:from-${announcement.priority}-400/20 before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-300`}
+              whileHover={{ y: -4, rotateX: 3, rotateY: 3, boxShadow: "0 15px 25px rgba(0, 0, 0, 0.1)" }}
+              transition={{ type: "spring", stiffness: 250 }}
+            >
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-red-600 transition-colors duration-300">
+                  {announcement.title}
+                </h3>
+                <p className="text-gray-700 mb-4 leading-relaxed">{announcement.message}</p>
+                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-red-600" />
+                    <span>{announcement.time}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-red-600" />
+                    <span>{announcement.location}</span>
                   </div>
                 </div>
-                <motion.div
-                  className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.2),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                />
-              </motion.div>
-            ))}
-          </div>
-        )}
+              </div>
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.2),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              />
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </section>
   );
