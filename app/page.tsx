@@ -80,7 +80,8 @@ export default function HomePage() {
   const [siteData, setSiteData] = useState(apiData); // Fallback to static data
   const [isLoading, setIsLoading] = useState(false);
   const [isUrgent, setIsUrgent] = useState(
-    apiData.find((c) => c.component === "AnnouncementsPreview")?.data.announcements.some((a) => a.priority === "high") || false
+    // apiData.find((c) => c.component === "AnnouncementsPreview")?.data.announcements.some((a) => a.priority === "high") || false
+    false
   ); // Derive urgency from high-priority announcements
   const aboutRef = useRef(null);
   const initiativesRef = useRef(null);

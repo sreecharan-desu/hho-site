@@ -5,16 +5,109 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { X, Download, Heart, Share2, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
-import { apiData } from "@/lib/api";
 
 interface DriveImage {
   id: string;
   url: string;
   title: string;
-  width?: number;
-  height?: number;
-  downloadUrl?: string;
+  downloadUrl: string;
 }
+
+// List of image filenames from /public/image-gallery/, excluding .pdf
+const imageFiles = [
+  "Aavirbhav1 Campus2.jpg",
+  "Aavirbhav2 campus2.jpg",
+  "Aavirbhav2k24.jpg",
+  "Aavirbhav3 campus2.jpg",
+  "Aavirbhav successmeet.jpg",
+  "arts aavirbhav1.jpg",
+  "arts aavirbhav2.jpg",
+  "arts aavirbhav3.jpg",
+  "arts aavirbhav4.jpg",
+  "Arts aavirbhav.jpg",
+  "Avigna1.jpg",
+  "Community Service1.jpg",
+  "Community Service2.jpg",
+  "Community Service3.jpg",
+  "Covid1.jpg",
+  "Covid2.jpg",
+  "Covid3.jpg",
+  "Covid4.jpg",
+  "Covid5.jpg",
+  "Covid6.jpg",
+  "Covid7.jpg",
+  "Crafts aavirbhav.jpg",
+  "Crafts ekadantha.jpg",
+  "Donation.jpg",
+  "Fund Raising Events1.jpg",
+  "Fund Raising Events2.jpg",
+  "IMG_20241221_150258.jpg",
+  "IMG_20241221_150300.jpg",
+  "IMG_20241221_150334.jpg",
+  "IMG_20241221_150510.jpg",
+  "IMG_20241221_154359.jpg",
+  "IMG_20241221_154701.jpg",
+  "IMG_20241221_175937.jpg",
+  "IMG_20241221_175939.jpg",
+  "IMG-20241221-WA0011.jpg",
+  "IMG_20241231_110245.jpg",
+  "IMG_20241231_110934.jpg",
+  "IMG_20241231_111556.jpg",
+  "IMG_20241231_113901.jpg",
+  "IMG_20250126_093936.jpg",
+  "IMG_20250126_093945.jpg",
+  "IMG_20250126_094015.jpg",
+  "IMG_20250126_094038.jpg",
+  "IMG_20250126_094040.jpg",
+  "IMG_20250126_094541.jpg",
+  "IMG_20250126_094547.jpg",
+  "IMG_20250126_094619.jpg",
+  "IMG_20250126_094654.jpg",
+  "IMG_20250126_094655.jpg",
+  "IMG_20250126_094656.jpg",
+  "news on Washing machines.jpg",
+  "oldage home donation2.jpg",
+  "oldage home donation.jpg",
+  "Ornate 2k24 badge.jpg",
+  "Our Contributions1.jpg",
+  "Our Contributions2.jpg",
+  "Our Contributions3.jpg",
+  "Our Contributions4.jpg",
+  "Our Contributions5.jpg",
+  "Our Contributions6.jpg",
+  "Semi-Christmas.jpg",
+  "Share a meal2.jpg",
+  "Share a meal.jpg",
+  "Shoe distribution1.jpg",
+  "Shoe distribution2.jpg",
+  "Shoe distribution3.jpg",
+  "Shoe distribution4.jpg",
+  "Social Events1.jpg",
+  "Social Events2.jpg",
+  "Social Events3.jpg",
+  "Social Events4.jpg",
+  "Social Events4.jpeg",
+  "Social Events5.jpeg",
+  "Social Events6.jpg",
+  "squirrel art.jpg",
+  "Summer intiative.jpg",
+  "Summer intiative2.jpg",
+  "Summer intiative3.jpg",
+  "Summer intiative4.jpg",
+  "Summer intiative5.jpg",
+  "Washing machine.jpg",
+  "Zumba session day1&2.jpg",
+  "Zumba session day3.jpg",
+  "Screenshot 2025-07-22 182819.png"
+];
+
+// Generate image objects
+const galleryImages: DriveImage[] = imageFiles.map((file, index) => ({
+  id: `${index + 1}`,
+  url: `/image-gallery/${file}`,
+  title: file,
+  downloadUrl: `/image-gallery/${file}`
+}));
 
 export default function DriveGallery() {
   const [images, setImages] = useState<DriveImage[]>([]);
@@ -26,26 +119,12 @@ export default function DriveGallery() {
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchImages = async () => {
+    const loadImages = async () => {
       try {
         setLoading(true);
+        // Simulate a delay to maintain loading animation (optional)
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const componentData: any = apiData.find(
-          (c): c is any => c.component === "DriveGallery"
-        )?.data;
-        const serverImages = componentData?.images ?? [];
-
-        try {
-          const response = await fetch("/api/drive-images");
-          if (response.ok) {
-            const additionalImages: DriveImage[] = await response.json();
-            setImages([...serverImages, ...additionalImages]);
-          } else {
-            throw new Error("Server unavailable");
-          }
-        } catch {
-          setImages(serverImages);
-        }
+        setImages(galleryImages);
       } catch (err) {
         setError("Failed to load images. Please try again later.");
         console.error("Error in DriveGallery:", err);
@@ -54,7 +133,7 @@ export default function DriveGallery() {
       }
     };
 
-    fetchImages();
+    loadImages();
   }, []);
 
   const openModal = useCallback((image: DriveImage, index: number) => {
@@ -97,20 +176,21 @@ export default function DriveGallery() {
   const handleDownload = useCallback((image: DriveImage, e: React.MouseEvent) => {
     e.stopPropagation();
     const link = document.createElement("a");
-    link.href = image.downloadUrl || image.url;
+    link.href = image.downloadUrl;
     link.download = image.title;
     link.click();
   }, []);
 
   const handleShare = useCallback((image: DriveImage, e: React.MouseEvent) => {
     e.stopPropagation();
+    const absoluteUrl = `${window.location.origin}${image.url}`;
     if (navigator.share) {
       navigator.share({
         title: image.title,
-        url: image.url,
+        url: absoluteUrl,
       });
     } else {
-      navigator.clipboard.writeText(image.url);
+      navigator.clipboard.writeText(absoluteUrl);
       alert("Image URL copied to clipboard!");
     }
   }, []);
@@ -309,11 +389,7 @@ export default function DriveGallery() {
                             hoveredImage === img.id ? "opacity-100" : "opacity-0"
                           }`}
                         />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                          <h3 className="text-white font-medium text-sm truncate">
-                            {img.title.replace(/\.[^/.]+$/, "")}
-                          </h3>
-                        </div>
+               =
                         <div
                           className={`absolute top-3 right-3 flex gap-2 transition-all duration-300 ${
                             hoveredImage === img.id ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
@@ -432,7 +508,6 @@ export default function DriveGallery() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold mb-1">{selectedImage.title.replace(/\.[^/.]+$/, "")}</h3>
                   <p className="text-sm text-gray-600">
                     Image {currentIndex + 1} of {images.length}
                   </p>
