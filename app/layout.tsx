@@ -1,5 +1,3 @@
-// app/layout.tsx
-
 import './globals.css';
 import { Inter } from 'next/font/google';
 import KeyboardWatcher from '@/components/KeyboardWatcher';
@@ -57,13 +55,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Force layout to 1024px width */}
         <meta name="viewport" content="width=1024" />
       </head>
       <body
         className={`${inter.className} bg-white text-black antialiased overflow-x-hidden`}
       >
-        <div className="w-[1024px] mx-auto">
+        <div className="w-[1024px] mx-auto min-h-screen">
           <KeyboardWatcher />
           {children}
         </div>
