@@ -1,5 +1,6 @@
 ### System Overview: HHO Donation & Awareness Platform
 
+
 This documentation outlines the architecture and functionality of the Helping Hands Organization (HHO) web platform. Built with Next.js, React, and TypeScript, the application serves as a dynamic, single-page interface for showcasing the organization's impact, driving fundraising campaigns, and engaging with the community.
 
 The platform is heavily animated using **Framer Motion**, with a strong emphasis on user experience through scroll-triggered animations and interactive elements. Content is designed to be managed dynamically via an external API, with a fallback to statically defined data, ensuring resilience and maintainability.
