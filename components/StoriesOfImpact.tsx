@@ -34,7 +34,8 @@ const StoriesOfImpact: React.FC = () => {
   const shuffleRoles = (roles: string[]): string[] => {
     const shuffled = roles
     return shuffled;
-  };
+  }; 
+  
 
   const shuffledRoles = shuffleRoles(roles);
 
