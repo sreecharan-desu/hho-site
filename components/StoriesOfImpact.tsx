@@ -42,7 +42,7 @@ const StoriesOfImpact: React.FC = () => {
   const testimonials: Testimonial[][] = [
     [
    {
-        name: "Anil Kumar",
+        name: "Ramesh",
         avatar: "A",
         avatarBg: "bg-pink-600",
         role: shuffledRoles[6],
