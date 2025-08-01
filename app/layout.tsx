@@ -54,13 +54,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="viewport" content="width=1024" />
-      </head>
+
       <body
         className={`${inter.className} bg-white text-black antialiased overflow-x-hidden`}
       >
-        <div className="w-[1024px] mx-auto min-h-screen">
+        <div className="mx-auto min-h-screen">
           <KeyboardWatcher />
           {children}
         </div>
