@@ -1,3 +1,6 @@
+/**
+ * apiData utility.
+ */
 export const apiData = [
   {
     component: "ProfessionalSections",
