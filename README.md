@@ -17,3 +17,7 @@ npm run build && npm start
 ## env
 
 none in code today. page content is static data in `lib/api.ts`. [SETUP.md](SETUP.md) lists variables for planned admin features.
+
+
+## Consistency & Discipline
+This project is maintained regularly to ensure documentation clarity and code quality. Small, daily improvements are prioritized over large, infrequent updates.
